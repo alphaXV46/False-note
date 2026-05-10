@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>False Note - Game Integritas</title>
+    <title>False Note - Game Integritas Mahasiswa</title>
     <style>
         body {
             margin: 0;
@@ -15,6 +15,7 @@
             height: 100vh;
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
         }
         #game-container {
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
@@ -23,21 +24,29 @@
             overflow: hidden;
         }
     </style>
+    <!-- Phaser Library -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 </head>
 <body>
     <div id="game-container"></div>
     
-    <!-- Game Scripts -->
-    <script src="src/GameState.js"></script>
-    <script src="src/scenes/BaseScene.js"></script>
-    <script src="src/scenes/BootScene.js"></script>
-    <script src="src/scenes/PreloadScene.js"></script>
-    <script src="src/scenes/MorningScene.js"></script>
-    <script src="src/scenes/AfternoonScene.js"></script>
-    <script src="src/scenes/EveningScene.js"></script>
-    <script src="src/scenes/ResultScene.js"></script>
-    <script src="src/scenes/GameOverScene.js"></script>
-    <script src="src/main.js"></script>
+    <!-- Data & Utils -->
+    <script src="js/data/gameState.js"></script>
+    <script src="js/data/achievements.js"></script>
+    <script src="js/utils/saveLoad.js"></script>
+    <script src="js/utils/timer.js"></script>
+
+    <!-- Scenes -->
+    <script src="js/scenes/BaseScene.js"></script>
+    <script src="js/scenes/BootScene.js"></script>
+    <script src="js/scenes/PreloadScene.js"></script>
+    <script src="js/scenes/MorningScene.js"></script>
+    <script src="js/scenes/AfternoonScene.js"></script>
+    <script src="js/scenes/EveningScene.js"></script>
+    <script src="js/scenes/ResultScene.js"></script>
+    <script src="js/scenes/GameOverScene.js"></script>
+
+    <!-- Entry Point -->
+    <script src="js/main.js"></script>
 </body>
 </html>
