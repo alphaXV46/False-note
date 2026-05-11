@@ -1,18 +1,27 @@
 // ===============================
 // FILE: js/utils/typewriter.js
-// DESKRIPSI: Fungsi utilitas untuk efek typewriter teks
+// DESKRIPSI: Fungsi utilitas untuk efek typewriter teks pada DOM
 // ===============================
 
-export function typewriterText(scene, x, y, fullText, speed = 30, style = {}, onComplete = null) {
-  // Buat objek teks kosong
-  const textObj = scene.add.text(x, y, '', {
-    fontFamily: 'Inter, sans-serif',
-    fontSize: '14px',
-    color: '#ffffff',
-    wordWrap: { width: scene.cameras.main.width - 80 },
-    lineSpacing: 6,
-    ...style
-  });
+export function typewriterText(scene, speakerName, fullText, speed = 30, onComplete = null) {
+  // Ambil referensi DOM
+  const dialogOverlay = document.getElementById('dialog-overlay');
+  const dialogName = document.getElementById('dialog-name');
+  const dialogText = document.getElementById('dialog-text');
+  const dialogContinue = document.getElementById('dialog-continue');
+  const dialogBox = document.getElementById('dialog-box');
+
+  if (!dialogOverlay || !dialogName || !dialogText) return null;
+
+  // Tampilkan overlay
+  dialogOverlay.classList.remove('hidden');
+  
+  // Set nama speaker
+  dialogName.textContent = speakerName.toUpperCase();
+  
+  // Kosongkan teks dan sembunyikan hint
+  dialogText.textContent = '';
+  if (dialogContinue) dialogContinue.classList.add('hidden');
 
   let currentCharIndex = 0;
   let isFinished = false;
@@ -22,15 +31,15 @@ export function typewriterText(scene, x, y, fullText, speed = 30, style = {}, on
     if (isFinished) return;
     
     isFinished = true;
-    textObj.setText(fullText);
+    dialogText.innerHTML = fullText.replace(/\n/g, '<br>');
     
     // Hentikan event timer
     if (timerEvent) {
       timerEvent.remove();
     }
     
-    // Hapus listener klik/tap (pointerdown)
-    scene.input.off('pointerdown', skipToFullText);
+    // Hapus listener klik DOM
+    dialogBox.removeEventListener('click', skipToFullText);
     
     // Panggil callback onComplete jika ada
     if (onComplete) {
@@ -39,12 +48,12 @@ export function typewriterText(scene, x, y, fullText, speed = 30, style = {}, on
   };
 
   // Event timer untuk mengetik satu per satu
-  // Menggunakan scene.time.addEvent() agar bisa otomatis pause jika scene di-pause
   const timerEvent = scene.time.addEvent({
     delay: speed,
     callback: () => {
       currentCharIndex++;
-      textObj.setText(fullText.substring(0, currentCharIndex));
+      const currentString = fullText.substring(0, currentCharIndex);
+      dialogText.innerHTML = currentString.replace(/\n/g, '<br>');
 
       // Jika teks sudah selesai diketik
       if (currentCharIndex >= fullText.length) {
@@ -55,13 +64,17 @@ export function typewriterText(scene, x, y, fullText, speed = 30, style = {}, on
     loop: true
   });
 
-  // Klik/tap di mana saja pada layar akan skip efek typewriter
-  scene.input.on('pointerdown', skipToFullText);
+  // Klik/tap pada DOM dialog box akan skip efek typewriter
+  dialogBox.addEventListener('click', skipToFullText);
 
-  // Return objek teks dan fungsi pembantu (jika dibutuhkan)
+  // Return objek fungsi pembantu
   return {
-    textObj: textObj,
     skip: skipToFullText,
+    destroy: () => {
+      dialogOverlay.classList.add('hidden');
+      if (timerEvent) timerEvent.remove();
+      dialogBox.removeEventListener('click', skipToFullText);
+    },
     onComplete: (cb) => {
       onComplete = cb;
       if (isFinished) onComplete();

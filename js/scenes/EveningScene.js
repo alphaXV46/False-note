@@ -94,33 +94,20 @@ export default class EveningScene extends Phaser.Scene {
     this._dialogQueue = [];
     this._buildDialogQueue(evening.dialog);
 
-    this.dialogBox = this.add.rectangle(width / 2, height - 80, width - 40, 120, 0x000000, 0.85)
-      .setStrokeStyle(1, 0x444444);
-
-    this.speakerText = this.add.text(30, height - 135, '', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '14px',
-      color: '#f97316',
-      fontStyle: 'bold'
-    });
-
-    this.continueHint = this.add.text(width - 30, height - 30, '▶ Klik untuk lanjut', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '11px',
-      color: '#888888'
-    }).setOrigin(1, 1);
-    this.continueHint.setVisible(false);
-
     this._currentDialogIndex = 0;
     this._isTyping = false;
     this._currentTypewriter = null;
     this._showNextDialog();
 
-    this.input.on('pointerdown', () => {
-      if (!this._isTyping) {
-        this._advanceDialog(evening, dayData);
-      }
-    });
+    const dialogBox = document.getElementById('dialog-box');
+    if (dialogBox) {
+      this._domClickListener = () => {
+        if (!this._isTyping) {
+          this._advanceDialog(evening, dayData);
+        }
+      };
+      dialogBox.addEventListener('click', this._domClickListener);
+    }
   }
 
   _buildDialogQueue(dialogArray) {
@@ -135,25 +122,23 @@ export default class EveningScene extends Phaser.Scene {
   _showNextDialog() {
     if (this._currentDialogIndex >= this._dialogQueue.length) return;
     const entry = this._dialogQueue[this._currentDialogIndex];
-    this.speakerText.setText(entry.speaker);
     
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
 
-    this.continueHint.setVisible(false);
     this._isTyping = true;
+    const continueHint = document.getElementById('dialog-continue');
+    if (continueHint) continueHint.classList.add('hidden');
 
     this._currentTypewriter = typewriterText(
       this,
-      30,
-      this.cameras.main.height - 110,
+      entry.speaker,
       entry.text,
       30,
-      {},
       () => {
         this._isTyping = false;
-        this.continueHint.setVisible(true);
+        if (continueHint) continueHint.classList.remove('hidden');
       }
     );
   }
@@ -163,7 +148,10 @@ export default class EveningScene extends Phaser.Scene {
     if (this._currentDialogIndex < this._dialogQueue.length) {
       this._showNextDialog();
     } else {
-      this.input.removeAllListeners('pointerdown');
+      const dialogBox = document.getElementById('dialog-box');
+      if (dialogBox && this._domClickListener) {
+        dialogBox.removeEventListener('click', this._domClickListener);
+      }
 
       if (evening.debate) {
         this._startDebate(evening.debate);
@@ -185,13 +173,12 @@ export default class EveningScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     this._fallacyManager = new FallacyManager(debateConfig);
 
-    // Bersihkan dialog box
-    this.dialogBox.setVisible(false);
-    this.speakerText.setVisible(false);
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    // Bersihkan DOM dialog
+    const dialogOverlay = document.getElementById('dialog-overlay');
+    if (dialogOverlay) dialogOverlay.classList.add('hidden');
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
-    this.continueHint.setVisible(false);
 
     // Label debat
     this.add.text(width / 2, 130, `⚔️ DEBAT vs ${debateConfig.opponent}`, {
@@ -335,12 +322,12 @@ export default class EveningScene extends Phaser.Scene {
   _showClimaxChoice(climaxConfig) {
     const { width, height } = this.cameras.main;
 
-    this.dialogBox.setVisible(false);
-    this.speakerText.setVisible(false);
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    // Bersihkan DOM dialog
+    const dialogOverlay = document.getElementById('dialog-overlay');
+    if (dialogOverlay) dialogOverlay.classList.add('hidden');
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
-    this.continueHint.setVisible(false);
 
     this.add.text(width / 2, 160, climaxConfig.question, {
       fontFamily: 'Inter, sans-serif',
@@ -421,6 +408,9 @@ export default class EveningScene extends Phaser.Scene {
   }
 
   shutdown() {
-    this.input.removeAllListeners('pointerdown');
+    const dialogBox = document.getElementById('dialog-box');
+    if (dialogBox && this._domClickListener) {
+      dialogBox.removeEventListener('click', this._domClickListener);
+    }
   }
 }

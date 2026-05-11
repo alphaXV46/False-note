@@ -14,6 +14,10 @@ export default class MorningScene extends Phaser.Scene {
     super({ key: 'MorningScene' });
   }
 
+  preload() {
+    this.load.image('bg_morning', 'assets/backgrounds/bg_dorm_morning.jpg');
+  }
+
   create() {
     const { width, height } = this.cameras.main;
     const currentDay = gameState.get('currentDay');
@@ -28,20 +32,18 @@ export default class MorningScene extends Phaser.Scene {
     const morning = dayData.morning;
     gameState.set('currentPeriod', 'morning');
 
-    // Background placeholder (warna solid)
-    this.cameras.main.setBackgroundColor('#1a1a2e');
-    this.add.rectangle(480, 270, 960, 540, 0x1a1a2e); // warna per lokasi
-
-    // Sprite placeholders
-    this.add.rectangle(200, 350, 128, 256, 0x0000ff); // Raka idle (biru)
-    this.add.rectangle(760, 350, 128, 256, 0xff0000); // Dr. Adrian (merah)
+    // Background Image
+    const bg = this.add.image(width / 2, height / 2, 'bg_morning');
+    const scale = Math.max(width / bg.width, height / bg.height);
+    bg.setScale(scale);
 
     // Label periode
-    this.add.text(width / 2, 110, '☀️ PAGI', {
+    this.add.text(width / 2, 40, '☀️ PAGI', {
       fontFamily: 'Inter, sans-serif',
-      fontSize: '14px',
+      fontSize: '18px',
       color: '#fbbf24',
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 4, fill: true }
     }).setOrigin(0.5);
 
     // ===============================
@@ -50,42 +52,26 @@ export default class MorningScene extends Phaser.Scene {
     this._dialogQueue = [];
     this._buildDialogQueue(morning.dialog);
 
-    // Dialog box area
-    this.dialogBox = this.add.rectangle(width / 2, height - 80, width - 40, 120, 0x000000, 0.85)
-      .setStrokeStyle(1, 0x444444);
-
-    this.speakerText = this.add.text(30, height - 135, '', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '14px',
-      color: '#fbbf24',
-      fontStyle: 'bold'
-    });
-
-    this.continueHint = this.add.text(width - 30, height - 30, '▶ Klik untuk lanjut', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '11px',
-      color: '#888888'
-    }).setOrigin(1, 1);
-    this.continueHint.setVisible(false);
-
     // Start dialog
     this._currentDialogIndex = 0;
     this._isTyping = false;
     this._currentTypewriter = null;
     this._showNextDialog();
 
-    // Click to advance dialog
-    this.input.on('pointerdown', () => {
-      if (!this._isTyping) {
-        this._advanceDialog(morning);
-      }
-    });
+    // Referensi ke DOM box untuk klik
+    const dialogBox = document.getElementById('dialog-box');
+    if (dialogBox) {
+      this._domClickListener = () => {
+        if (!this._isTyping) {
+          this._advanceDialog(morning);
+        }
+      };
+      dialogBox.addEventListener('click', this._domClickListener);
+    }
   }
 
   // ===============================
   // FUNGSI: _buildDialogQueue()
-  // DESKRIPSI: Flatten dialog entries menjadi antrian sederhana.
-  // PARAMETER: dialogArray (array)
   // ===============================
   _buildDialogQueue(dialogArray) {
     this._dialogQueue = [];
@@ -101,40 +87,35 @@ export default class MorningScene extends Phaser.Scene {
 
   // ===============================
   // FUNGSI: _showNextDialog()
-  // DESKRIPSI: Tampilkan baris dialog berikutnya.
   // ===============================
   _showNextDialog() {
     if (this._currentDialogIndex >= this._dialogQueue.length) {
       return;
     }
     const entry = this._dialogQueue[this._currentDialogIndex];
-    this.speakerText.setText(entry.speaker);
     
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
 
-    this.continueHint.setVisible(false);
     this._isTyping = true;
+    const continueHint = document.getElementById('dialog-continue');
+    if (continueHint) continueHint.classList.add('hidden');
 
     this._currentTypewriter = typewriterText(
       this,
-      30,
-      this.cameras.main.height - 110,
+      entry.speaker,
       entry.text,
       30,
-      {},
       () => {
         this._isTyping = false;
-        this.continueHint.setVisible(true);
+        if (continueHint) continueHint.classList.remove('hidden');
       }
     );
   }
 
   // ===============================
   // FUNGSI: _advanceDialog()
-  // DESKRIPSI: Maju ke dialog berikutnya atau mulai mini-game.
-  // PARAMETER: morningData (object)
   // ===============================
   _advanceDialog(morningData) {
     this._currentDialogIndex++;
@@ -142,15 +123,16 @@ export default class MorningScene extends Phaser.Scene {
       this._showNextDialog();
     } else {
       // Dialog selesai → mulai mini-game
-      this.input.removeAllListeners('pointerdown');
+      const dialogBox = document.getElementById('dialog-box');
+      if (dialogBox && this._domClickListener) {
+        dialogBox.removeEventListener('click', this._domClickListener);
+      }
       this._startMiniGame(morningData);
     }
   }
 
   // ===============================
   // FUNGSI: _startMiniGame()
-  // DESKRIPSI: Tampilkan mini-game dari data JSON.
-  // PARAMETER: morningData (object)
   // ===============================
   _startMiniGame(morningData) {
     const { width, height } = this.cameras.main;
@@ -161,13 +143,12 @@ export default class MorningScene extends Phaser.Scene {
       return;
     }
 
-    // Bersihkan dialog
-    this.dialogBox.setVisible(false);
-    this.speakerText.setVisible(false);
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    // Bersihkan DOM dialog
+    const dialogOverlay = document.getElementById('dialog-overlay');
+    if (dialogOverlay) dialogOverlay.classList.add('hidden');
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
-    this.continueHint.setVisible(false);
 
     // Setup MiniGameManager
     const mgm = new MiniGameManager({
@@ -176,8 +157,9 @@ export default class MorningScene extends Phaser.Scene {
       suspicionGain: morningData.suspicionGain
     });
 
-    // Question
-    this.add.text(width / 2, 140, miniGameConfig.question, {
+    // Label Mini-Game
+    this.add.rectangle(width / 2, 140, width, 80, 0x0f172a, 0.8);
+    this.add.text(width / 2, 125, miniGameConfig.question, {
       fontFamily: 'Inter, sans-serif',
       fontSize: '16px',
       color: '#ffffff',
@@ -186,23 +168,22 @@ export default class MorningScene extends Phaser.Scene {
       wordWrap: { width: width - 80 }
     }).setOrigin(0.5);
 
-    // Label tipe mini-game
     const typeLabels = {
       'email_sorting': '📧 EMAIL SORTING',
       'false_note_compare': '📄 DOKUMEN COMPARE',
     };
-    this.add.text(width / 2, 165, typeLabels[miniGameConfig.type] || miniGameConfig.type, {
+    this.add.text(width / 2, 155, typeLabels[miniGameConfig.type] || miniGameConfig.type, {
       fontFamily: 'Inter, sans-serif',
       fontSize: '11px',
-      color: '#888888'
+      color: '#fbbf24'
     }).setOrigin(0.5);
 
     // Options sebagai tombol
     miniGameConfig.options.forEach((opt, index) => {
       const btnY = 220 + (index * 70);
-      const btn = this.add.rectangle(width / 2, btnY, width - 100, 50, 0x2a2a3e)
+      const btn = this.add.rectangle(width / 2, btnY, width - 100, 50, 0x1e293b)
         .setInteractive({ useHandCursor: true })
-        .setStrokeStyle(1, 0x555555);
+        .setStrokeStyle(1, 0x334155);
 
       const btnText = this.add.text(width / 2, btnY, opt.text, {
         fontFamily: 'Inter, sans-serif',
@@ -212,13 +193,8 @@ export default class MorningScene extends Phaser.Scene {
         wordWrap: { width: width - 140 }
       }).setOrigin(0.5);
 
-      btn.on('pointerover', () => {
-        btn.setStrokeStyle(2, 0xfbbf24);
-      });
-
-      btn.on('pointerout', () => {
-        btn.setStrokeStyle(1, 0x555555);
-      });
+      btn.on('pointerover', () => btn.setStrokeStyle(2, 0xfbbf24));
+      btn.on('pointerout', () => btn.setStrokeStyle(1, 0x334155));
 
       btn.on('pointerdown', () => {
         const result = mgm.checkAnswer(index);
@@ -231,33 +207,34 @@ export default class MorningScene extends Phaser.Scene {
 
   // ===============================
   // FUNGSI: _showMiniGameFeedback()
-  // DESKRIPSI: Tampilkan feedback setelah mini-game dijawab.
-  // PARAMETER: result (object) — { correct, feedback }
   // ===============================
   _showMiniGameFeedback(result) {
     const { width, height } = this.cameras.main;
 
-    const feedbackColor = result.correct ? '#00cc44' : '#ff4444';
+    const feedbackColor = result.correct ? '#00cc44' : '#ef4444';
     const feedbackIcon = result.correct ? '✅' : '❌';
 
     // Overlay feedback
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
 
     this.add.text(width / 2, height / 2 - 20, `${feedbackIcon} ${result.feedback}`, {
       fontFamily: 'Inter, sans-serif',
-      fontSize: '16px',
+      fontSize: '18px',
       color: feedbackColor,
       fontStyle: 'bold',
       align: 'center',
       wordWrap: { width: width - 80 }
     }).setOrigin(0.5);
 
-    const continueBtn = this.add.text(width / 2, height / 2 + 40, '▶ Lanjut ke Siang', {
+    const continueBtn = this.add.text(width / 2, height / 2 + 50, '▶ LANJUT KE SIANG', {
       fontFamily: 'Inter, sans-serif',
       fontSize: '14px',
-      color: '#fbbf24',
-      fontStyle: 'bold'
+      color: '#ffffff',
+      backgroundColor: '#fbbf24',
+      padding: { x: 20, y: 10 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    
+    continueBtn.setTint(0x000000); // Teks hitam di atas background amber
 
     continueBtn.on('pointerdown', () => {
       this.scene.start('AfternoonScene');
@@ -265,6 +242,9 @@ export default class MorningScene extends Phaser.Scene {
   }
 
   shutdown() {
-    this.input.removeAllListeners('pointerdown');
+    const dialogBox = document.getElementById('dialog-box');
+    if (dialogBox && this._domClickListener) {
+      dialogBox.removeEventListener('click', this._domClickListener);
+    }
   }
 }

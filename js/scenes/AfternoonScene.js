@@ -14,6 +14,10 @@ export default class AfternoonScene extends Phaser.Scene {
     super({ key: 'AfternoonScene' });
   }
 
+  preload() {
+    this.load.image('bg_afternoon', 'assets/backgrounds/bg_faculty_day.jpg');
+  }
+
   create() {
     const { width, height } = this.cameras.main;
     const currentDay = gameState.get('currentDay');
@@ -28,106 +32,106 @@ export default class AfternoonScene extends Phaser.Scene {
     const afternoon = dayData.afternoon;
     gameState.set('currentPeriod', 'afternoon');
 
-    // Background placeholder (warna solid)
-    this.cameras.main.setBackgroundColor('#16213e');
-    this.add.rectangle(480, 270, 960, 540, 0x1a1a2e); // warna per lokasi
-
-    // Sprite placeholders
-    this.add.rectangle(200, 350, 128, 256, 0x0000ff); // Raka idle (biru)
-    this.add.rectangle(760, 350, 128, 256, 0xff0000); // Dr. Adrian (merah)
+    // Background Image
+    const bg = this.add.image(width / 2, height / 2, 'bg_afternoon');
+    const scale = Math.max(width / bg.width, height / bg.height);
+    bg.setScale(scale);
 
     // Label periode
-    this.add.text(width / 2, 110, '🌤️ SIANG', {
+    this.add.text(width / 2, 40, '🌤️ SIANG', {
       fontFamily: 'Inter, sans-serif',
-      fontSize: '14px',
-      color: '#38bdf8',
-      fontStyle: 'bold'
+      fontSize: '18px',
+      color: '#fbbf24',
+      fontStyle: 'bold',
+      shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 4, fill: true }
     }).setOrigin(0.5);
 
     // ===============================
-    // DIALOG SYSTEM (sama seperti MorningScene)
+    // DIALOG SYSTEM
     // ===============================
     this._dialogQueue = [];
     this._buildDialogQueue(afternoon.dialog);
 
-    this.dialogBox = this.add.rectangle(width / 2, height - 80, width - 40, 120, 0x000000, 0.85)
-      .setStrokeStyle(1, 0x444444);
-
-    this.speakerText = this.add.text(30, height - 135, '', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '14px',
-      color: '#38bdf8',
-      fontStyle: 'bold'
-    });
-
-    this.continueHint = this.add.text(width - 30, height - 30, '▶ Klik untuk lanjut', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '11px',
-      color: '#888888'
-    }).setOrigin(1, 1);
-    this.continueHint.setVisible(false);
-
+    // Start dialog
     this._currentDialogIndex = 0;
     this._isTyping = false;
     this._currentTypewriter = null;
     this._showNextDialog();
 
-    this.input.on('pointerdown', () => {
-      if (!this._isTyping) {
-        this._advanceDialog(afternoon);
-      }
-    });
+    // Click to advance dialog via DOM
+    const dialogBox = document.getElementById('dialog-box');
+    if (dialogBox) {
+      this._domClickListener = () => {
+        if (!this._isTyping) {
+          this._advanceDialog(afternoon);
+        }
+      };
+      dialogBox.addEventListener('click', this._domClickListener);
+    }
   }
 
+  // ===============================
+  // FUNGSI: _buildDialogQueue()
+  // ===============================
   _buildDialogQueue(dialogArray) {
     this._dialogQueue = [];
     for (const entry of dialogArray) {
       for (const line of entry.text) {
-        this._dialogQueue.push({ speaker: entry.speaker, text: line });
+        this._dialogQueue.push({
+          speaker: entry.speaker,
+          text: line
+        });
       }
     }
   }
 
+  // ===============================
+  // FUNGSI: _showNextDialog()
+  // ===============================
   _showNextDialog() {
-    if (this._currentDialogIndex >= this._dialogQueue.length) return;
+    if (this._currentDialogIndex >= this._dialogQueue.length) {
+      return;
+    }
     const entry = this._dialogQueue[this._currentDialogIndex];
-    this.speakerText.setText(entry.speaker);
     
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
 
-    this.continueHint.setVisible(false);
     this._isTyping = true;
+    const continueHint = document.getElementById('dialog-continue');
+    if (continueHint) continueHint.classList.add('hidden');
 
     this._currentTypewriter = typewriterText(
       this,
-      30,
-      this.cameras.main.height - 110,
+      entry.speaker,
       entry.text,
       30,
-      {},
       () => {
         this._isTyping = false;
-        this.continueHint.setVisible(true);
+        if (continueHint) continueHint.classList.remove('hidden');
       }
     );
   }
 
+  // ===============================
+  // FUNGSI: _advanceDialog()
+  // ===============================
   _advanceDialog(afternoonData) {
     this._currentDialogIndex++;
     if (this._currentDialogIndex < this._dialogQueue.length) {
       this._showNextDialog();
     } else {
-      this.input.removeAllListeners('pointerdown');
+      const dialogBox = document.getElementById('dialog-box');
+      if (dialogBox && this._domClickListener) {
+        dialogBox.removeEventListener('click', this._domClickListener);
+      }
       this._startMiniGame(afternoonData);
     }
   }
 
   // ===============================
   // FUNGSI: _startMiniGame()
-  // DESKRIPSI: Tampilkan mini-game false note compare.
-  // PARAMETER: afternoonData (object)
   // ===============================
   _startMiniGame(afternoonData) {
     const { width, height } = this.cameras.main;
@@ -138,22 +142,22 @@ export default class AfternoonScene extends Phaser.Scene {
       return;
     }
 
-    // Bersihkan dialog
-    this.dialogBox.setVisible(false);
-    this.speakerText.setVisible(false);
-    if (this._currentTypewriter && this._currentTypewriter.textObj) {
-      this._currentTypewriter.textObj.destroy();
+    // Bersihkan DOM dialog
+    const dialogOverlay = document.getElementById('dialog-overlay');
+    if (dialogOverlay) dialogOverlay.classList.add('hidden');
+    if (this._currentTypewriter && this._currentTypewriter.destroy) {
+      this._currentTypewriter.destroy();
     }
-    this.continueHint.setVisible(false);
 
     const mgm = new MiniGameManager({
       ...miniGameConfig,
-      integrityCostIfWrong: afternoonData.integrityCostIfWrong || 10,
-      suspicionGain: afternoonData.suspicionGain || 5
+      integrityCostIfWrong: afternoonData.integrityCostIfWrong,
+      suspicionGain: afternoonData.suspicionGain
     });
 
-    // Question
-    this.add.text(width / 2, 140, miniGameConfig.question, {
+    // Label Mini-Game
+    this.add.rectangle(width / 2, 140, width, 80, 0x0f172a, 0.8);
+    this.add.text(width / 2, 125, miniGameConfig.question, {
       fontFamily: 'Inter, sans-serif',
       fontSize: '16px',
       color: '#ffffff',
@@ -162,20 +166,19 @@ export default class AfternoonScene extends Phaser.Scene {
       wordWrap: { width: width - 80 }
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 165, '📄 DOKUMEN COMPARE', {
+    this.add.text(width / 2, 155, miniGameConfig.type, {
       fontFamily: 'Inter, sans-serif',
       fontSize: '11px',
-      color: '#888888'
+      color: '#fbbf24'
     }).setOrigin(0.5);
 
-    // Options
     miniGameConfig.options.forEach((opt, index) => {
       const btnY = 220 + (index * 70);
       const btn = this.add.rectangle(width / 2, btnY, width - 100, 50, 0x1e293b)
         .setInteractive({ useHandCursor: true })
-        .setStrokeStyle(1, 0x555555);
+        .setStrokeStyle(1, 0x334155);
 
-      this.add.text(width / 2, btnY, opt.text, {
+      const btnText = this.add.text(width / 2, btnY, opt.text, {
         fontFamily: 'Inter, sans-serif',
         fontSize: '14px',
         color: '#ffffff',
@@ -183,38 +186,47 @@ export default class AfternoonScene extends Phaser.Scene {
         wordWrap: { width: width - 140 }
       }).setOrigin(0.5);
 
-      btn.on('pointerover', () => btn.setStrokeStyle(2, 0x38bdf8));
-      btn.on('pointerout', () => btn.setStrokeStyle(1, 0x555555));
+      btn.on('pointerover', () => btn.setStrokeStyle(2, 0xfbbf24));
+      btn.on('pointerout', () => btn.setStrokeStyle(1, 0x334155));
 
       btn.on('pointerdown', () => {
         const result = mgm.checkAnswer(index);
-        if (result) this._showMiniGameFeedback(result);
+        if (result) {
+          this._showMiniGameFeedback(result);
+        }
       });
     });
   }
 
+  // ===============================
+  // FUNGSI: _showMiniGameFeedback()
+  // ===============================
   _showMiniGameFeedback(result) {
     const { width, height } = this.cameras.main;
-    const feedbackColor = result.correct ? '#00cc44' : '#ff4444';
+
+    const feedbackColor = result.correct ? '#00cc44' : '#ef4444';
     const feedbackIcon = result.correct ? '✅' : '❌';
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
 
     this.add.text(width / 2, height / 2 - 20, `${feedbackIcon} ${result.feedback}`, {
       fontFamily: 'Inter, sans-serif',
-      fontSize: '16px',
+      fontSize: '18px',
       color: feedbackColor,
       fontStyle: 'bold',
       align: 'center',
       wordWrap: { width: width - 80 }
     }).setOrigin(0.5);
 
-    const continueBtn = this.add.text(width / 2, height / 2 + 40, '▶ Lanjut ke Sore', {
+    const continueBtn = this.add.text(width / 2, height / 2 + 50, '▶ LANJUT KE SORE', {
       fontFamily: 'Inter, sans-serif',
       fontSize: '14px',
-      color: '#f97316',
-      fontStyle: 'bold'
+      color: '#ffffff',
+      backgroundColor: '#fbbf24',
+      padding: { x: 20, y: 10 }
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    
+    continueBtn.setTint(0x000000);
 
     continueBtn.on('pointerdown', () => {
       this.scene.start('EveningScene');
@@ -222,6 +234,9 @@ export default class AfternoonScene extends Phaser.Scene {
   }
 
   shutdown() {
-    this.input.removeAllListeners('pointerdown');
+    const dialogBox = document.getElementById('dialog-box');
+    if (dialogBox && this._domClickListener) {
+      dialogBox.removeEventListener('click', this._domClickListener);
+    }
   }
 }
