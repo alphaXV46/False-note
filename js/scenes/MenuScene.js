@@ -11,70 +11,52 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.cameras.main;
+    // Referensi elemen DOM
+    const menuOverlay = document.getElementById('main-menu');
+    const btnStart = document.getElementById('btn-start');
+    const btnContinue = document.getElementById('btn-continue');
+    const saveError = document.getElementById('save-error');
 
-    // Background: bg_black (rectangle hitam dulu, ganti aset nanti)
+    // Tampilkan menu DOM
+    if (menuOverlay) {
+      menuOverlay.classList.remove('hidden');
+    }
+
+    // --- Listener: MULAI BARU ---
+    if (btnStart) {
+      btnStart.onclick = () => {
+        gameState.reset();
+        this._transitionOut();
+      };
+    }
+
+    // --- Listener: LANJUTKAN ---
+    if (btnContinue) {
+      btnContinue.onclick = () => {
+        const success = saveLoadManager.load();
+        if (success) {
+          this._transitionOut();
+        } else {
+          if (saveError) {
+            saveError.classList.remove('hidden');
+            setTimeout(() => saveError.classList.add('hidden'), 2000);
+          }
+        }
+      };
+    }
+
+    // Pastikan canvas tetap hitam di belakang DOM
     this.cameras.main.setBackgroundColor('#000000');
+  }
 
-    // Teks judul: "FALSE NOTE" — font besar, putih, center
-    this.add.text(width / 2, height / 2 - 80, 'FALSE NOTE', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '64px',
-      color: '#ffffff',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
-
-    // Subjudul: "The Silent Witness" — lebih kecil, abu-abu
-    this.add.text(width / 2, height / 2 - 20, 'The Silent Witness', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '24px',
-      color: '#888888',
-      fontStyle: 'italic'
-    }).setOrigin(0.5);
-
-    // Tombol "Mulai dari awal."
-    const startBtn = this.add.text(width / 2, height / 2 + 60, 'Mulai dari awal.', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '18px',
-      color: '#ffffff',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-    startBtn.on('pointerover', () => startBtn.setColor('#fbbf24'));
-    startBtn.on('pointerout', () => startBtn.setColor('#ffffff'));
-    startBtn.on('pointerdown', () => {
-      // klik → reset GameState → start BootScene
-      gameState.reset();
-      this.scene.start('BootScene');
-    });
-
-    // Tombol "Lanjutkan perjuangan?"
-    const continueBtn = this.add.text(width / 2, height / 2 + 100, 'Lanjutkan perjuangan?', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '18px',
-      color: '#ffffff',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-    continueBtn.on('pointerover', () => continueBtn.setColor('#fbbf24'));
-    continueBtn.on('pointerout', () => continueBtn.setColor('#ffffff'));
-    continueBtn.on('pointerdown', () => {
-      // klik → SaveLoadManager.load() 
-      const success = saveLoadManager.load();
-      if (success) {
-        // jika berhasil start BootScene
-        this.scene.start('BootScene');
-      } else {
-        // jika gagal tampilkan "Save tidak ditemukan."
-        const errorMsg = this.add.text(width / 2, height / 2 + 140, 'Save tidak ditemukan.', {
-          fontFamily: 'Inter, sans-serif',
-          fontSize: '14px',
-          color: '#ef4444',
-          fontStyle: 'italic'
-        }).setOrigin(0.5);
-        
-        this.time.delayedCall(2000, () => {
-            errorMsg.destroy();
-        });
-      }
-    });
+  /**
+   * Sembunyikan menu DOM dan pindah ke BootScene
+   */
+  _transitionOut() {
+    const menuOverlay = document.getElementById('main-menu');
+    if (menuOverlay) {
+      menuOverlay.classList.add('hidden');
+    }
+    this.scene.start('BootScene');
   }
 }
