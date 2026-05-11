@@ -1,0 +1,61 @@
+{
+  "day": 5,
+  "titleCard": "HARI KE-5: Semua Orang Tahu, Tidak Ada yang Bicara",
+  "headlineMorning": "File Terenkripsi Berhasil Dibuka",
+  "headlineEvening": "Netizen Terbelah: #PercayaRaka vs #BuzzerGajian",
+  "headlineEveningResult": "Perdebatan Memanas di Media Sosial Kampus",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Dimas", "text": ["Raka, aku berhasil decrypt file itu.", "Kamu harus lihat isinya."]},
+      {"speaker": "Raka", "text": ["FALSE_NOTE.sys...", "Ini berisi semua transaksi ilegal."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "File terenkripsi berhasil dibuka. Pilih data yang paling krusial.",
+      "options": [
+        {"text": "Log aktivitas server biasa", "isCorrect": false, "feedbackWrong": "Ini log teknis biasa. Tidak ada bukti korupsi."},
+        {"text": "Daftar transfer ke rekening pribadi dosen", "isCorrect": true, "evidenceGain": "false_note_decrypted", "feedbackRight": "FALSE_NOTE.sys berisi semua bukti transfer ilegal!"}
+      ]
+    },
+    "suspicionGain": 10,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Data ini sangat sensitif.", "Aku harus hati-hati menyimpannya."]},
+      {"speaker": "Sistem", "text": ["Raka memverifikasi isi FALSE_NOTE.sys.", "Setiap transaksi memiliki timestamp."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Verifikasi data FALSE_NOTE.sys. Mana transaksi yang paling mencurigakan?",
+      "options": [
+        {"text": "Transfer gaji dosen sesuai SK", "isCorrect": false, "feedbackWrong": "Ini gaji resmi. Semua sesuai prosedur."},
+        {"text": "Transfer Rp 150jt ke rekening atas nama keluarga Adrian", "isCorrect": true, "feedbackRight": "Transfer ke rekening keluarga. Ini bukti penggelapan langsung."}
+      ]
+    },
+    "suspicionGain": 10,
+    "integrityCostIfWrong": 15
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Semua staf sudah setuju.", "Laporan keuangan tidak ada masalah.", "Masa kamu sendiri yang beda?"]},
+      {"speaker": "Bella", "text": ["Raka, mungkin kamu salah.", "Semua orang bilang tidak ada masalah."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Bandwagon",
+      "fallacyExplanation": "Bandwagon adalah argumen bahwa sesuatu benar karena banyak orang mempercayainya. Contoh: 'Semua setuju, masa kamu yang beda?'",
+      "fallacyCounterTip": "Kebenaran tidak ditentukan oleh jumlah. Tunjukkan data objektif.",
+      "statements": [
+        {"text": "Semua staf setuju. Masa kamu sendiri yang tidak?", "fallacy": "Bandwagon"}
+      ],
+      "correctEvidence": "false_note_decrypted",
+      "publicTrustChange": 15,
+      "wrongFeedback": "Kamu terjebak Bandwagon. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

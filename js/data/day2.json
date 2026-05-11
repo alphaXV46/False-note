@@ -1,0 +1,61 @@
+{
+  "day": 2,
+  "titleCard": "HARI KE-2: Angka Tidak Pernah Bohong",
+  "headlineMorning": "Laporan Keuangan Fakultas Dipertanyakan",
+  "headlineEvening": "Selisih Dana Beasiswa: Salah Cetak atau Sengaja?",
+  "headlineEveningResult": "Mahasiswa Mulai Bertanya soal Transparansi Dana",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Pagi hari kedua.", "Raka mendapat akses ke arsip lama."]},
+      {"speaker": "Raka", "text": ["Arsip ini tersembunyi rapi.", "Kenapa tidak pernah diaudit?"]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih dokumen yang perlu diperiksa lebih lanjut.",
+      "options": [
+        {"text": "Jadwal rapat rutin dosen", "isCorrect": false, "feedbackWrong": "Ini jadwal biasa. Tidak mencurigakan."},
+        {"text": "Laporan pengeluaran tanpa tanda tangan", "isCorrect": true, "feedbackRight": "Laporan tanpa tanda tangan? Ini harus diverifikasi."}
+      ]
+    },
+    "suspicionGain": 5,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Ada dua versi laporan.", "Yang satu resmi, yang satu... tidak."]},
+      {"speaker": "Sistem", "text": ["Raka menemukan catatan tersembunyi.", "Angka-angka di dalamnya sangat berbeda."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Bandingkan kedua dokumen. Mana yang dipalsukan?",
+      "options": [
+        {"text": "Dokumen dengan stempel resmi fakultas", "isCorrect": false, "feedbackWrong": "Stempel bisa dipalsukan, tapi ini asli."},
+        {"text": "Catatan tulisan tangan tanpa header", "isCorrect": true, "evidenceGain": "rekam_bicara_bella", "feedbackRight": "Catatan rahasia ini menyebut nama-nama penerima 'fee'."}
+      ]
+    },
+    "suspicionGain": 7,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Bella", "text": ["Raka, jangan terlalu dalam.", "Kamu bisa kena masalah."]},
+      {"speaker": "Dr. Adrian", "text": ["Jadi kamu bilang seluruh fakultas korupsi?", "Itu tuduhan berat, Raka."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Strawman",
+      "fallacyExplanation": "Strawman adalah mendistorsi argumen lawan agar lebih mudah diserang. Contoh: 'Jadi kamu bilang SEMUA dosen korupsi?'",
+      "fallacyCounterTip": "Koreksi distorsi. Tegaskan argumen aslimu.",
+      "statements": [
+        {"text": "Jadi kamu bilang seluruh fakultas korupsi? Itu fitnah!", "fallacy": "Strawman"}
+      ],
+      "correctEvidence": "bukti_selisih",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu terjebak Strawman. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

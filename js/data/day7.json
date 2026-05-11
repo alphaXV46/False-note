@@ -1,0 +1,68 @@
+{
+  "day": 7,
+  "titleCard": "HARI KE-7: Saatnya Bicara",
+  "headlineMorning": "Sidang Internal FH Hari Ini",
+  "headlineEvening": "Seluruh Kampus Menunggu Keputusan",
+  "headlineEveningResult": "Keputusan Telah Diambil. Kebenaran Menang.",
+  "morning": {
+    "background": "bg_sidang",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Hari sidang tiba.", "Seluruh fakultas hadir.", "Raka berdiri di podium."]},
+      {"speaker": "Raka", "text": ["Ini saatnya.", "Semua bukti ada di tangan.", "Tidak ada jalan mundur."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Sebelum sidang dimulai, pilih strategi pembukaan.",
+      "options": [
+        {"text": "Menyerang karakter Adrian secara personal", "isCorrect": false, "feedbackWrong": "Itu Ad Hominem. Kamu lebih baik dari itu."},
+        {"text": "Presentasikan kronologi bukti secara sistematis", "isCorrect": true, "feedbackRight": "Profesional. Data yang bicara, bukan emosi."}
+      ]
+    },
+    "suspicionGain": 5,
+    "integrityCostIfWrong": 15
+  },
+  "afternoon": {
+    "background": "bg_sidang",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Ini semua fitnah!", "Kamu tidak punya bukti kuat!"]},
+      {"speaker": "Raka", "text": ["Saya punya.", "Dan semuanya ada di sini."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih bukti pamungkas untuk menutup argumen.",
+      "options": [
+        {"text": "Email Potongan saja", "isCorrect": false, "feedbackWrong": "Satu bukti tidak cukup untuk kasus sebesar ini."},
+        {"text": "FALSE_NOTE.sys — seluruh rekam jejak transaksi", "isCorrect": true, "feedbackRight": "Bukti digital tidak bisa dibantah. Sempurna."}
+      ]
+    },
+    "suspicionGain": 5,
+    "integrityCostIfWrong": 15
+  },
+  "evening": {
+    "background": "bg_sidang",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Nilaimu jelek, Raka.", "Jangan sok jadi pahlawan.", "Urus dulu akademikmu sendiri."]},
+      {"speaker": "Raka", "text": ["Nilai saya tidak relevan.", "Yang relevan adalah data ini."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Red Herring",
+      "fallacyExplanation": "Red Herring adalah mengalihkan topik pembicaraan ke hal yang tidak relevan. Contoh: 'Nilai kamu jelek. Jangan ngurus dana orang lain.'",
+      "fallacyCounterTip": "Kembalikan fokus ke topik utama. Jangan terpancing pengalihan.",
+      "statements": [
+        {"text": "Nilai kamu jelek. Jangan ngurus dana orang lain.", "fallacy": "Red Herring"}
+      ],
+      "correctEvidence": "false_note_decrypted",
+      "publicTrustChange": 20,
+      "wrongFeedback": "Kamu terjebak Red Herring. Integritas -10."
+    },
+    "climaxChoice": {
+      "question": "Sidang hampir selesai. Apa keputusan akhirmu?",
+      "options": [
+        {"text": "Laporkan ke Rektor", "isCorrect": true, "feedbackRight": "Kamu memilih kebenaran. Apapun risikonya."},
+        {"text": "Simpan bukti, jangan ambil risiko", "isCorrect": false, "feedbackWrong": "Kamu memilih diam. Korupsi terus berjalan."}
+      ]
+    }
+  },
+  "checkpoint": false
+}

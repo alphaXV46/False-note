@@ -1,137 +1,203 @@
-/**
- * Afternoon Scene - Forensik Dokumen
- * Mengimplementasikan audit dokumen dan SQL Injection.
- */
-class AfternoonScene extends BaseScene {
-    constructor() {
-        super('AfternoonScene');
-        this.evidenceFound = 0;
-        this.evidenceStatus = [false, false, false, false];
+// ===============================
+// FILE: js/scenes/AfternoonScene.js
+// DESKRIPSI: Template scene untuk periode SIANG.
+// Menampilkan dialog + mini-game false note compare.
+// Data diambil dari dayX.json berdasarkan currentDay.
+// State diubah lewat gameState, bukan lokal.
+// ===============================
+import gameState from '../managers/GameState.js';
+import MiniGameManager from '../managers/MiniGameManager.js';
+
+export default class AfternoonScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'AfternoonScene' });
+  }
+
+  create() {
+    const { width, height } = this.cameras.main;
+    const currentDay = gameState.get('currentDay');
+    const dayData = this.cache.json.get(`day${currentDay}`);
+
+    if (!dayData || !dayData.afternoon) {
+      console.error(`[AfternoonScene] Data siang hari ke-${currentDay} tidak ditemukan.`);
+      this.scene.start('EveningScene');
+      return;
     }
 
-    create() {
-        this.evidenceFound = 0;
-        this.evidenceStatus = [false, false, false, false];
-        this.manipulated = false;
-        this.hintUsed = false;
+    const afternoon = dayData.afternoon;
+    gameState.set('currentPeriod', 'afternoon');
 
-        // Background
-        this.add.image(640, 360, 'bg_desktop');
-        
-        // Header & Splitter
-        this.add.text(640, 40, 'AUDIT DOKUMEN & INTEGRITAS DATA', { fontSize: '28px', fontStyle: 'bold' }).setOrigin(0.5);
-        this.add.graphics().lineStyle(2, 0x3498db).strokeLineShape(new Phaser.Geom.Line(640, 100, 640, 600));
+    // Background placeholder (warna solid)
+    this.cameras.main.setBackgroundColor('#16213e');
 
-        // Dokumen Layout
-        this.createDocuments();
-        
-        // Toolbar
-        this.createToolbar();
+    // Label periode
+    this.add.text(width / 2, 110, '🌤️ SIANG', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '14px',
+      color: '#38bdf8',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
 
-        // SQL Injection (Hidden)
-        this.createSQLGame();
+    // ===============================
+    // DIALOG SYSTEM (sama seperti MorningScene)
+    // ===============================
+    this._dialogQueue = [];
+    this._buildDialogQueue(afternoon.dialog);
+
+    this.dialogBox = this.add.rectangle(width / 2, height - 80, width - 40, 120, 0x000000, 0.85)
+      .setStrokeStyle(1, 0x444444);
+
+    this.speakerText = this.add.text(30, height - 135, '', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '14px',
+      color: '#38bdf8',
+      fontStyle: 'bold'
+    });
+
+    this.dialogText = this.add.text(30, height - 110, '', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '14px',
+      color: '#ffffff',
+      wordWrap: { width: width - 80 },
+      lineSpacing: 6
+    });
+
+    this.continueHint = this.add.text(width - 30, height - 30, '▶ Klik untuk lanjut', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '11px',
+      color: '#888888'
+    }).setOrigin(1, 1);
+
+    this._currentDialogIndex = 0;
+    this._showNextDialog();
+
+    this.input.on('pointerdown', () => {
+      this._advanceDialog(afternoon);
+    });
+  }
+
+  _buildDialogQueue(dialogArray) {
+    this._dialogQueue = [];
+    for (const entry of dialogArray) {
+      for (const line of entry.text) {
+        this._dialogQueue.push({ speaker: entry.speaker, text: line });
+      }
+    }
+  }
+
+  _showNextDialog() {
+    if (this._currentDialogIndex >= this._dialogQueue.length) return;
+    const entry = this._dialogQueue[this._currentDialogIndex];
+    this.speakerText.setText(entry.speaker);
+    this.dialogText.setText(entry.text);
+  }
+
+  _advanceDialog(afternoonData) {
+    this._currentDialogIndex++;
+    if (this._currentDialogIndex < this._dialogQueue.length) {
+      this._showNextDialog();
+    } else {
+      this.input.removeAllListeners('pointerdown');
+      this._startMiniGame(afternoonData);
+    }
+  }
+
+  // ===============================
+  // FUNGSI: _startMiniGame()
+  // DESKRIPSI: Tampilkan mini-game false note compare.
+  // PARAMETER: afternoonData (object)
+  // ===============================
+  _startMiniGame(afternoonData) {
+    const { width, height } = this.cameras.main;
+    const miniGameConfig = afternoonData.miniGame;
+
+    if (!miniGameConfig) {
+      this.scene.start('EveningScene');
+      return;
     }
 
-    createDocuments() {
-        // Publik
-        const pub = this.add.container(80, 120);
-        pub.add(this.add.graphics().fillStyle(0xffffff).fillRect(0, 0, 480, 400));
-        pub.add(this.add.text(20, 20, "LAPORAN PUBLIK\n------------------\nDana: Rp 500.000.000\nTanggal: 15 Des 2024\n\nStatus: SELESAI\nTTD: Bendahara, Rektor", { color: '#000', fontSize: '18px' }));
+    // Bersihkan dialog
+    this.dialogBox.setVisible(false);
+    this.speakerText.setVisible(false);
+    this.dialogText.setVisible(false);
+    this.continueHint.setVisible(false);
 
-        // Internal
-        const int = this.add.container(720, 120);
-        int.add(this.add.graphics().fillStyle(0xfff9c4).fillRect(0, 0, 480, 400));
-        int.add(this.add.text(20, 20, "MEMO INTERNAL\n------------------\nDana: Rp 300.000.000\nTanggal: 10 Des 2024\n\nCatatan: fee admin 40%\nTTD: Bendahara", { color: '#000', fontSize: '18px' }));
+    const mgm = new MiniGameManager({
+      ...miniGameConfig,
+      integrityCostIfWrong: afternoonData.integrityCostIfWrong || 10,
+      suspicionGain: afternoonData.suspicionGain || 5
+    });
 
-        // Interactive Highlight Areas on Memo Internal
-        this.addHighlight(850, 175, 150, 30, 0, "Nominal Berbeda");
-        this.addHighlight(820, 205, 150, 30, 1, "Tanggal Berbeda");
-        this.addHighlight(740, 290, 200, 30, 2, "TTD Tidak Lengkap");
-    }
+    // Question
+    this.add.text(width / 2, 140, miniGameConfig.question, {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '16px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: width - 80 }
+    }).setOrigin(0.5);
 
-    addHighlight(x, y, w, h, index, desc) {
-        const zone = this.add.zone(x, y, w, h).setOrigin(0, 0).setInteractive();
-        zone.on('pointerdown', () => {
-            if (this.evidenceStatus[index]) return;
-            this.evidenceStatus[index] = true;
-            this.evidenceFound++;
-            this.add.graphics().fillStyle(0xffff00, 0.4).fillRect(x, y, w, h);
-            this.showMessage(`BUKTI: ${desc}`, "#00ff00");
-            if (this.evidenceFound === 3) this.sqlContainer.setVisible(true);
-        });
-    }
+    this.add.text(width / 2, 165, '📄 DOKUMEN COMPARE', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '11px',
+      color: '#888888'
+    }).setOrigin(0.5);
 
-    createToolbar() {
-        const bar = this.add.container(640, 660);
-        
-        // Tombol Manipulasi (#Jujur test)
-        const btnManip = this.createButton(-300, 0, 'Manipulasi Data', () => {
-            this.manipulated = true;
-            GameState.integritasScore -= 10;
-            GameState.reputasiScore += 5;
-            this.showMessage("Data Dimanipulasi! (Integritas -10)", "#ff0000");
-        });
+    // Options
+    miniGameConfig.options.forEach((opt, index) => {
+      const btnY = 220 + (index * 70);
+      const btn = this.add.rectangle(width / 2, btnY, width - 100, 50, 0x1e293b)
+        .setInteractive({ useHandCursor: true })
+        .setStrokeStyle(1, 0x555555);
 
-        // Tombol Hint (#Mandiri test)
-        const btnHint = this.createButton(-100, 0, 'Petunjuk', () => {
-            this.hintUsed = true;
-            this.showMessage("Cari perbedaan angka dan tanggal di memo kuning.", "#f1c40f");
-        });
+      this.add.text(width / 2, btnY, opt.text, {
+        fontFamily: 'Inter, sans-serif',
+        fontSize: '14px',
+        color: '#ffffff',
+        align: 'center',
+        wordWrap: { width: width - 140 }
+      }).setOrigin(0.5);
 
-        const btnSave = this.createButton(200, 0, 'Simpan & Selesai', () => this.finishAfternoon());
-        
-        bar.add([btnManip, btnHint, btnSave]);
-    }
+      btn.on('pointerover', () => btn.setStrokeStyle(2, 0x38bdf8));
+      btn.on('pointerout', () => btn.setStrokeStyle(1, 0x555555));
 
-    createSQLGame() {
-        this.sqlContainer = this.add.container(640, 360).setVisible(false).setDepth(200);
-        this.sqlContainer.add(this.add.graphics().fillStyle(0x000000, 0.95).fillRect(-300, -150, 600, 300));
-        this.sqlContainer.add(this.add.text(0, -100, 'SQL INJECTION REQUIRED\nEnter bypass query:', { color: '#00ff00' }).setOrigin(0.5));
-        
-        const inputDisp = this.add.text(0, 0, "Klik & Ketik: ' OR '1'='1", { fontSize: '24px', backgroundColor: '#222', padding: 10 }).setOrigin(0.5);
-        this.sqlContainer.add(inputDisp);
+      btn.on('pointerdown', () => {
+        const result = mgm.checkAnswer(index);
+        if (result) this._showMiniGameFeedback(result);
+      });
+    });
+  }
 
-        let typed = "";
-        this.input.keyboard.on('keydown', (e) => {
-            if (!this.sqlContainer.visible) return;
-            if (e.keyCode === 13 && typed === "' OR '1'='1") {
-                this.evidenceStatus[3] = true;
-                this.evidenceFound++;
-                GameState.inventoryEvidence.push("Database Log Anomali");
-                this.showMessage("Bypass Berhasil!", "#00ff00");
-                this.time.delayedCall(1500, () => this.sqlContainer.setVisible(false));
-            } else if (e.keyCode === 8) {
-                typed = typed.slice(0, -1);
-            } else if (e.key.length === 1) {
-                typed += e.key;
-            }
-            inputDisp.setText(typed + "_");
-        });
-    }
+  _showMiniGameFeedback(result) {
+    const { width, height } = this.cameras.main;
+    const feedbackColor = result.correct ? '#00cc44' : '#ff4444';
+    const feedbackIcon = result.correct ? '✅' : '❌';
 
-    finishAfternoon() {
-        if (this.evidenceFound < 1) {
-            this.showMessage("Cari bukti terlebih dahulu!", "#ff0000");
-            return;
-        }
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
 
-        // Achievements
-        if (!this.manipulated) {
-            GameState.integritasScore += 15;
-            AchievementSystem.unlock("Jujur");
-            this.showAchievement("Jujur", "+15 Integritas");
-        }
-        if (!this.hintUsed && this.evidenceStatus[3]) {
-            GameState.integritasScore += 5;
-            AchievementSystem.unlock("Mandiri");
-            this.showAchievement("Mandiri", "+5 Integritas");
-        }
+    this.add.text(width / 2, height / 2 - 20, `${feedbackIcon} ${result.feedback}`, {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '16px',
+      color: feedbackColor,
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: width - 80 }
+    }).setOrigin(0.5);
 
-        // Push findings to inventory
-        if (this.evidenceStatus[0]) GameState.inventoryEvidence.push("Bukti Selisih Anggaran");
-        if (this.evidenceStatus[2]) GameState.inventoryEvidence.push("Bukti Pelanggaran Prosedur TTD");
+    const continueBtn = this.add.text(width / 2, height / 2 + 40, '▶ Lanjut ke Sore', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '14px',
+      color: '#f97316',
+      fontStyle: 'bold'
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        SaveLoad.save();
-        this.transitionTo('EveningScene');
-    }
+    continueBtn.on('pointerdown', () => {
+      this.scene.start('EveningScene');
+    });
+  }
+
+  shutdown() {
+    this.input.removeAllListeners('pointerdown');
+  }
 }

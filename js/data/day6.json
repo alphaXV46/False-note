@@ -1,0 +1,61 @@
+{
+  "day": 6,
+  "titleCard": "HARI KE-6: Satu Lawan Semua",
+  "headlineMorning": "Debat Sengit di Media Sosial Kampus",
+  "headlineEvening": "Tekanan pada Raka Semakin Besar",
+  "headlineEveningResult": "Raka Berdiri Sendiri. Tapi Buktinya Kuat.",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Tekanan semakin besar.", "Akun anonim menyerang Raka di media sosial."]},
+      {"speaker": "Raka", "text": ["Mereka mulai panik.", "Itu artinya aku di jalur yang benar."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Akun buzzer menyebarkan hoax. Pilih yang harus dilawan.",
+      "options": [
+        {"text": "Postingan meme lucu tentang kampus", "isCorrect": false, "feedbackWrong": "Ini bukan serangan. Hanya meme biasa."},
+        {"text": "Thread: 'Raka dibayar pihak luar untuk jatuhkan FH'", "isCorrect": true, "feedbackRight": "Ini fitnah terorganisir. Harus dilawan dengan fakta."}
+      ]
+    },
+    "suspicionGain": 8,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_balairung",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Aku harus susun semua bukti.", "Besok sidang internal."]},
+      {"speaker": "Sistem", "text": ["Raka mengorganisir seluruh bukti di Balairung.", "Semuanya harus rapi dan kronologis."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Susun bukti secara kronologis. Mana yang harus jadi pembuka?",
+      "options": [
+        {"text": "FALSE_NOTE.sys (bukti paling kuat)", "isCorrect": false, "feedbackWrong": "Bukti terkuat bukan untuk pembuka. Simpan untuk penutup."},
+        {"text": "Email Potongan (bukti pertama ditemukan)", "isCorrect": true, "feedbackRight": "Benar! Mulai dari awal, bangun narasi kronologis."}
+      ]
+    },
+    "suspicionGain": 5,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Raka, ini pilihan terakhir.", "Diam dan beasiswamu aman.", "Atau bicara dan kehilangan segalanya."]},
+      {"speaker": "Raka", "text": ["Itu bukan pilihan.", "Itu ancaman."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "False Dilemma",
+      "fallacyExplanation": "False Dilemma adalah menyajikan hanya dua pilihan seolah tidak ada opsi lain. Contoh: 'Diam atau dipecat. Pilih.'",
+      "fallacyCounterTip": "Tunjukkan bahwa ada opsi ketiga. Realitas tidak hitam-putih.",
+      "statements": [
+        {"text": "Diam atau dipecat. Pilih satu, Raka.", "fallacy": "False Dilemma"}
+      ],
+      "correctEvidence": "rekam_bicara_bella",
+      "publicTrustChange": 15,
+      "wrongFeedback": "Kamu terjebak False Dilemma. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

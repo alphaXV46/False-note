@@ -1,0 +1,52 @@
+/* ===============================
+   FALSE NOTE – Custom CSS
+   Game-specific styles beyond Tailwind
+   =============================== */
+
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+/* Game Container */
+#game-container {
+  width: 960px;
+  height: 540px;
+  position: relative;
+  margin: auto;
+}
+
+#game-container canvas {
+  display: block;
+}
+
+/* Evidence Tooltip */
+#evidence-tooltip {
+  transition: opacity 0.15s ease;
+}
+
+/* Dialog text typewriter cursor */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #fbbf24;
+  animation: blink 0.7s infinite;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}

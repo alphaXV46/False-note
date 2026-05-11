@@ -1,0 +1,32 @@
+{
+  "bukti_potongan": {
+    "name": "Email Potongan",
+    "desc": "Email admin minta potongan 10% dari dana beasiswa.",
+    "hint": "Sanggah klaim 'tidak ada pungli'"
+  },
+  "bukti_selisih": {
+    "name": "Selisih Anggaran",
+    "desc": "Laporan tertulis 500jt, real note hanya 300jt.",
+    "hint": "Sanggah klaim 'dana sudah sesuai'"
+  },
+  "rekam_bicara_bella": {
+    "name": "Rekaman Bella",
+    "desc": "Bella menyebut nama 'fee admin' secara eksplisit.",
+    "hint": "Sanggah penyangkalan keterlibatan Bella"
+  },
+  "false_note_decrypted": {
+    "name": "FALSE_NOTE.sys",
+    "desc": "File terenkripsi berisi seluruh transaksi ilegal.",
+    "hint": "Bukti utama untuk sidang hari ke-7"
+  },
+  "screenshot_chat_admin": {
+    "name": "Screenshot Chat Admin",
+    "desc": "Screenshot percakapan admin terkait pembagian dana ilegal.",
+    "hint": "Sanggah klaim 'admin tidak terlibat'"
+  },
+  "kuitansi_fiktif": {
+    "name": "Kuitansi Fiktif",
+    "desc": "Kuitansi pembelian yang tidak pernah terjadi.",
+    "hint": "Sanggah klaim 'semua pengeluaran sah'"
+  }
+}

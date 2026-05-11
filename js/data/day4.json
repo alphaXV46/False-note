@@ -1,0 +1,61 @@
+{
+  "day": 4,
+  "titleCard": "HARI KE-4: Kepercayaan Bisa Dibeli",
+  "headlineMorning": "Sumber Internal Bocorkan Dokumen Rahasia",
+  "headlineEvening": "#PercayaRaka Trending di Kampus",
+  "headlineEveningResult": "Dukungan untuk Raka Bertambah, Tapi Ancaman Juga",
+  "morning": {
+    "background": "bg_legal_kopi",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Raka bertemu informan di kedai kopi.", "Suasana tegang. Tidak ada yang boleh tahu."]},
+      {"speaker": "Raka", "text": ["Terima kasih sudah mau bicara.", "Aku tahu ini berisiko untukmu."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Informan memberikan amplop. Pilih isinya yang paling penting.",
+      "options": [
+        {"text": "Fotokopi KTP informan", "isCorrect": false, "feedbackWrong": "Ini identitas informan. Kamu harus melindunginya, bukan mengeksposnya."},
+        {"text": "Kuitansi pembelian yang tidak pernah terjadi", "isCorrect": true, "evidenceGain": "kuitansi_fiktif", "feedbackRight": "Kuitansi fiktif! Bukti penggelapan dana."}
+      ]
+    },
+    "suspicionGain": 7,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Kuitansi ini palsu.", "Barang-barang ini tidak pernah dibeli."]},
+      {"speaker": "Sistem", "text": ["Raka mencocokkan kuitansi dengan inventaris nyata.", "Banyak item yang fiktif."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Cocokkan kuitansi dengan inventaris. Mana yang fiktif?",
+      "options": [
+        {"text": "Pembelian 50 buku referensi hukum", "isCorrect": false, "feedbackWrong": "Buku-buku ini memang ada di perpustakaan."},
+        {"text": "Pembelian 20 laptop @Rp 25 juta", "isCorrect": true, "feedbackRight": "Tidak ada 20 laptop baru. Ini pembelian fiktif."}
+      ]
+    },
+    "suspicionGain": 8,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Profesor besar sudah memeriksa laporannya.", "Tidak ada masalah.", "Kamu mau menantang profesor?"]},
+      {"speaker": "Raka", "text": ["Fakta tidak butuh gelar untuk bicara."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Appeal to Authority",
+      "fallacyExplanation": "Appeal to Authority adalah menggunakan otoritas seseorang untuk membenarkan argumen, bukan data atau fakta. Contoh: 'Profesor X bilang benar, maka benar.'",
+      "fallacyCounterTip": "Minta bukti data, bukan nama besar. Otoritas bisa salah.",
+      "statements": [
+        {"text": "Profesor X sudah menyetujui laporan ini. Kamu siapa?", "fallacy": "Appeal to Authority"}
+      ],
+      "correctEvidence": "kuitansi_fiktif",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu terjebak Appeal to Authority. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

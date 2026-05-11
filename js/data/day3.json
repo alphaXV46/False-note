@@ -1,0 +1,60 @@
+{
+  "day": 3,
+  "titleCard": "HARI KE-3: Senjata Paling Tajam Adalah Data",
+  "headlineMorning": "Dr. Adrian Bantah Semua Tuduhan",
+  "headlineEvening": "Mahasiswa UI Diklaim Cari Perhatian",
+  "headlineEveningResult": "Opini Publik Terpecah: Siapa yang Bohong?",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Dr. Adrian memberi komentar di media.", "Dia menyebut Raka 'mahasiswa bermasalah'."]},
+      {"speaker": "Raka", "text": ["Aku tidak boleh gentar.", "Data yang bicara, bukan gosip."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih pesan yang berisi ancaman terselubung.",
+      "options": [
+        {"text": "Undangan rapat evaluasi magang", "isCorrect": false, "feedbackWrong": "Ini undangan resmi. Tidak ada yang aneh."},
+        {"text": "Pesan: 'Hati-hati dengan masa depanmu'", "isCorrect": true, "feedbackRight": "Ini ancaman terselubung. Bukti intimidasi."}
+      ]
+    },
+    "suspicionGain": 6,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Dimas", "text": ["Raka, aku punya sesuatu.", "Tapi kamu harus janji jaga rahasia."]},
+      {"speaker": "Raka", "text": ["Apa itu?", "Aku bisa dipercaya."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Dimas memberikan screenshot. Pilih bagian yang jadi bukti.",
+      "options": [
+        {"text": "Chat biasa tentang jadwal kuliah", "isCorrect": false, "feedbackWrong": "Ini percakapan normal. Bukan bukti."},
+        {"text": "Chat admin: 'Bagianmu 15%, sisanya ke atas'", "isCorrect": true, "evidenceGain": "screenshot_chat_admin", "feedbackRight": "Pembagian ilegal tertulis jelas di sini."}
+      ]
+    },
+    "suspicionGain": 8,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Sejak kamu mulai ribut,", "dana beasiswa malah tertunda.", "Kamu yang merugikan teman-temanmu."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "False Cause",
+      "fallacyExplanation": "False Cause adalah menyalahkan sesuatu sebagai penyebab padahal tidak ada hubungan kausal. Contoh: 'Sejak kamu protes, dana seret.'",
+      "fallacyCounterTip": "Tunjukkan bahwa korelasi bukan kausalitas. Minta bukti hubungan langsung.",
+      "statements": [
+        {"text": "Sejak kamu protes, dana beasiswa malah seret. Ini salahmu!", "fallacy": "False Cause"}
+      ],
+      "correctEvidence": "screenshot_chat_admin",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu terjebak False Cause. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

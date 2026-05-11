@@ -1,0 +1,60 @@
+{
+  "day": 1,
+  "titleCard": "HARI KE-1: Awal yang Tenang",
+  "headlineMorning": "Mahasiswa Magang FH UI Mulai Tugas",
+  "headlineEvening": "Polemik Beasiswa Mulai Menyeruak",
+  "headlineEveningResult": "Netizen Mulai Curiga dengan Dana Beasiswa",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Hari ke-1 magang.", "Raka datang lebih pagi dari biasanya."]},
+      {"speaker": "Raka", "text": ["Semoga hari ini lancar.", "Aku harus fokus.", "Jangan sampai ada yang curiga."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih email yang mencurigakan.",
+      "options": [
+        {"text": "Rekap nilai beasiswa semester lalu", "isCorrect": false, "feedbackWrong": "Tidak ada yang aneh di sini."},
+        {"text": "Minta potongan 10% untuk admin", "isCorrect": true, "evidenceGain": "bukti_potongan", "feedbackRight": "Nah ini. Modus pungli klasik."}
+      ]
+    },
+    "suspicionGain": 5,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Laporan ini aneh.", "Angkanya tidak cocok."]},
+      {"speaker": "Sistem", "text": ["Raka membandingkan dua dokumen.", "Ada selisih yang mencolok."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih nominal yang berbeda antara laporan dan real note.",
+      "options": [
+        {"text": "Rp 500.000.000", "isCorrect": false, "feedbackWrong": "Ini angka di laporan resmi."},
+        {"text": "Rp 300.000.000", "isCorrect": true, "evidenceGain": "bukti_selisih", "feedbackRight": "Selisih 200 juta. Ini bukan salah ketik."}
+      ]
+    },
+    "suspicionGain": 8,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Raka, aku dengar kabar.", "Kamu menyelidiki dana beasiswa?", "Fokus saja pada tugas magangmu."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Ad Hominem",
+      "fallacyExplanation": "Ad Hominem adalah serangan ke pribadi lawan, bukan ke argumennya. Contoh: 'Raka anak nakal, jangan didengar.'",
+      "fallacyCounterTip": "Abaikan serangan pribadi. Minta bukti data.",
+      "statements": [
+        {"text": "Raka cuma mahasiswa magang. Ngapain ribut soal keuangan?", "fallacy": "Ad Hominem"}
+      ],
+      "correctEvidence": "bukti_potongan",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu terjebak Ad Hominem. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}
