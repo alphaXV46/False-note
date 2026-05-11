@@ -30,13 +30,13 @@ const config = {
   scene: [
     MenuScene,
     BootScene,
-    UIScene,
     TitleCardScene,
     MorningScene,
     AfternoonScene,
     EveningScene,
     ResultScene,
     EndingScene,
+    UIScene,
   ],
 };
 

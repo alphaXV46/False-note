@@ -64,10 +64,11 @@ class MiniGameManager {
   _onCorrect(evidenceId, feedback) {
     // Tambah bukti ke inventory jika ada
     if (evidenceId) {
-      const inv = gameState.get('inventory');
-      if (!inv.includes(evidenceId)) {
-        inv.push(evidenceId);
-        gameState.set('inventory', inv);
+      const currentInv = gameState.get('inventory') || [];
+      if (!currentInv.includes(evidenceId)) {
+        const newInv = [...currentInv, evidenceId]; // Clone and add
+        gameState.set('inventory', newInv);
+        console.log(`[MiniGameManager] Bukti didapat: ${evidenceId}. Inventory sekarang:`, newInv);
       }
     }
 
