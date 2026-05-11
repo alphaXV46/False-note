@@ -24,6 +24,12 @@ class PreloadScene extends BaseScene {
             progressBox.destroy();
         });
 
+        // Load Real Assets
+        this.load.image('menu_bg', 'assets/images/menu_bg.png');
+        this.load.image('morning_bg', 'assets/images/morning_bg.png');
+        this.load.image('char_raka', 'assets/images/char_raka.png');
+        this.load.image('char_adrian', 'assets/images/char_adrian.png');
+
         // Generate Placeholders
         this.generatePlaceholders();
     }

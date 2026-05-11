@@ -94,6 +94,76 @@ class BaseScene extends Phaser.Scene {
     }
 
     /**
+     * Menampilkan dialog ala Visual Novel dengan Typewriter Effect
+     * @param {string} name - Nama karakter (Raka atau Dr. Adrian)
+     * @param {string} message - Pesan yang ditampilkan
+     */
+    showDialogue(name, message) {
+        const dialogueBox = document.getElementById('dialogue-box');
+        const nameBox = document.getElementById('character-name-box');
+        const textBox = document.getElementById('dialogue-text');
+        
+        if (!dialogueBox || !nameBox || !textBox) return;
+
+        // Tampilkan box
+        dialogueBox.style.display = 'flex';
+
+        // Set nama dan warna box
+        nameBox.textContent = name;
+        nameBox.className = ''; // Reset classes
+        if (name.toLowerCase().includes('raka')) {
+            nameBox.classList.add('name-raka');
+        } else if (name.toLowerCase().includes('adrian')) {
+            nameBox.classList.add('name-adrian');
+        }
+
+        // Typewriter Effect
+        this.typewriterEffect(message, textBox);
+    }
+
+    /**
+     * Efek mengetik untuk teks dialog
+     */
+    typewriterEffect(text, element) {
+        element.textContent = '';
+        let i = 0;
+        const speed = 30; // ms per karakter
+
+        // Hentikan timer sebelumnya jika ada
+        if (this.typewriterTimer) {
+            clearInterval(this.typewriterTimer);
+        }
+
+        this.typewriterTimer = setInterval(() => {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(this.typewriterTimer);
+                this.typewriterTimer = null;
+            }
+        }, speed);
+    }
+
+    /**
+     * Update visual Suspicion Meter di CSS Overlay
+     */
+    updateSuspicionMeter(value) {
+        const bar = document.getElementById('suspicion-bar-fill');
+        const container = document.getElementById('suspicion-meter-container');
+        if (!bar || !container) return;
+
+        bar.style.width = `${value}%`;
+
+        // Pulse effect jika di atas 70%
+        if (value >= 70) {
+            container.classList.add('pulse-warning');
+        } else {
+            container.classList.remove('pulse-warning');
+        }
+    }
+
+    /**
      * Bantuan untuk menampilkan pesan teks singkat di tengah
      */
     showMessage(msg, color = '#ffffff') {

@@ -19,50 +19,94 @@ class MorningScene extends BaseScene {
         this.taskStatus = [false, false, false];
         this.investigationDone = false;
 
-        // Background
-        this.add.tileSprite(640, 360, 1280, 720, 'grid_pattern').setAlpha(0.2);
+        // 1. Background (Cinematic Asset) with Zoom-in Transition
+        this.bg = this.add.image(640, 360, 'morning_bg').setDisplaySize(1350, 760); // Start slightly larger
+        this.bg.setAlpha(0);
         
+        this.tweens.add({
+            targets: this.bg,
+            alpha: 1,
+            displayHeight: 720,
+            displayWidth: 1280,
+            duration: 2000,
+            ease: 'Power2'
+        });
+
+        // 2. Character Sprite Group (Empty center initially)
+        this.chars = this.add.group();
+
         this.createUI();
         this.createTimer();
         
+        // Memicu animasi masuk karakter sebelum mini-game verifikasi berkas dimulai
+        this.time.delayedCall(1000, () => {
+            this.enterCharacter('char_raka', 'left');
+            this.showDialogue('Raka', 'Hari ini adalah hari pertama magang di FH UI. Aku harus tetap fokus dan teliti dalam memproses berkas beasiswa ini.');
+        });
+
         // Container untuk Overlay Mini-game
         this.overlay = this.add.container(0, 0).setVisible(false).setDepth(100);
-        this.overlayBg = this.add.graphics().fillStyle(0x000000, 0.9).fillRect(0, 0, 1280, 720);
+        this.overlayBg = this.add.graphics().fillStyle(0x000000, 0.4).fillRect(0, 0, 1280, 720);
         this.overlay.add(this.overlayBg);
     }
 
-    createUI() {
-        // Top Bar Statistik
-        this.add.graphics().fillStyle(0x1a233a, 1).fillRect(0, 0, 1280, 60);
-        this.statText = this.add.text(20, 20, `INTEGRITAS: ${GameState.integritasScore} | HARI: ${GameState.currentDay} / 7`, { fontSize: '18px', fontStyle: 'bold' });
-        
-        // Panel Tugas (Kiri)
-        this.add.text(50, 100, 'TUGAS MAGANG (WAJIB)', { fontSize: '24px', fontStyle: 'bold', color: '#3498db' });
-        const taskNames = [
-            '1. Verifikasi Berkas Beasiswa',
-            '2. Sortir Email Legitimate',
-            '3. Rekap Surat Menyurat'
-        ];
-        taskNames.forEach((name, i) => {
-            this.createButton(250, 200 + (i * 80), name, () => this.openTask(i));
+    /**
+     * Efek masuk karakter ala VN
+     */
+    enterCharacter(key, position) {
+        const xPos = position === 'left' ? 300 : (position === 'right' ? 980 : 640);
+        const char = this.add.image(xPos, 800, key).setOrigin(0.5, 1);
+        char.setScale(0.8);
+        char.setAlpha(0);
+
+        this.tweens.add({
+            targets: char,
+            y: 720,
+            alpha: 1,
+            duration: 800,
+            ease: 'Back.easeOut'
         });
 
-        // Panel Investigasi (Kanan) - Muncul setelah Tugas 1
-        this.folderPanel = this.add.container(800, 0).setVisible(false);
-        this.folderPanel.add(this.add.text(50, 100, 'FOLDER TERSEMBUNYI', { fontSize: '24px', color: '#f1c40f', fontStyle: 'bold' }));
-        this.folderPanel.add(this.createButton(250, 200, 'Akses & Dekripsi', () => this.startInvestigation()));
+        this.chars.add(char);
+        return char;
+    }
 
-        // Suspicion Meter (Bawah)
-        this.add.text(20, 680, 'SUSPICION METER', { fontSize: '14px', color: '#e74c3c' });
-        this.suspicionBar = this.add.graphics();
-        this.updateSuspicion();
+    createUI() {
+        // Update CSS UI Initial State
+        this.updateSuspicionMeter(GameState.suspicionMeter);
+        
+        // Update Task Panel list in DOM
+        const taskList = document.getElementById('task-list');
+        if (taskList) {
+            taskList.innerHTML = '';
+            const taskNames = ['Verifikasi Berkas', 'Sortir Email', 'Rekap Surat'];
+            taskNames.forEach((name, i) => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center space-x-2 cursor-pointer hover:text-white transition-colors';
+                li.innerHTML = `<div class="h-2 w-2 rounded-full ${this.taskStatus[i] ? 'bg-green-500' : 'bg-slate-700'}"></div><span>${name}</span>`;
+                li.onclick = () => this.openTask(i);
+                taskList.appendChild(li);
+            });
+
+            // Tambahkan tugas investigasi jika tugas pertama selesai
+            if (this.taskStatus[0] && !this.investigationDone) {
+                const li = document.createElement('li');
+                li.className = 'flex items-center space-x-2 cursor-pointer text-yellow-400 hover:text-yellow-300 transition-colors mt-4 border-t border-slate-700 pt-2';
+                li.innerHTML = `<div class="h-2 w-2 rounded-full bg-yellow-500 animate-pulse"></div><span>Akses Folder Tersembunyi</span>`;
+                li.onclick = () => this.startInvestigation();
+                taskList.appendChild(li);
+            } else if (this.investigationDone) {
+                const li = document.createElement('li');
+                li.className = 'flex items-center space-x-2 text-slate-500 mt-4 border-t border-slate-700 pt-2';
+                li.innerHTML = `<div class="h-2 w-2 rounded-full bg-green-500"></div><span>Investigasi Selesai</span>`;
+                taskList.appendChild(li);
+            }
+        }
     }
 
     updateSuspicion() {
-        this.suspicionBar.clear();
-        this.suspicionBar.fillStyle(0x333333).fillRect(150, 680, 1080, 20);
-        const color = GameState.suspicionMeter > 80 ? 0xff0000 : 0xe74c3c;
-        this.suspicionBar.fillStyle(color).fillRect(150, 680, 10.8 * GameState.suspicionMeter, 20);
+        // Override old updateSuspicion to use CSS method
+        this.updateSuspicionMeter(GameState.suspicionMeter);
     }
 
     createTimer() {
@@ -205,6 +249,9 @@ class MorningScene extends BaseScene {
         GameState.buktiStrength += 10;
         GameState.inventoryEvidence.push("False Note Fragment");
         
+        // Refresh UI
+        this.createUI();
+
         if (!hintUsed) {
             GameState.integritasScore += 5;
             AchievementSystem.unlock("Mandiri");
@@ -226,16 +273,24 @@ class MorningScene extends BaseScene {
         this.taskStatus[index] = true;
         this.tasksCompleted++;
         GameState.suspicionMeter = Math.max(0, GameState.suspicionMeter - 10);
-        if (index === 0) this.folderPanel.setVisible(true);
+        
+        // Refresh UI to show completed status in CSS Task Panel
+        this.createUI();
         this.updateSuspicion();
         this.overlay.setVisible(false);
         
+        // Jika tugas 1 selesai, tambahkan opsi investigasi ke panel tugas
+        if (index === 0 && !this.investigationDone) {
+            this.showDialogue('Raka', 'Tunggu, ada folder yang tidak biasa di desktop ini. Mungkin aku harus memeriksanya...');
+        }
+
         if (this.tasksCompleted === 3) {
             GameState.integritasScore += 5;
             GameState.suspicionMeter = Math.max(0, GameState.suspicionMeter - 5);
             AchievementSystem.unlock("Disiplin");
             this.showAchievement("Disiplin", "+5 Integritas, -5 Suspicion");
             this.showMessage("Semua Tugas Selesai!", "#00ff00");
+            this.showDialogue('Raka', 'Semua tugas hari ini sudah selesai. Sekarang tinggal menunggu instruksi selanjutnya dari Dr. Adrian.');
         }
     }
 

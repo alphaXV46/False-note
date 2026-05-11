@@ -18,13 +18,166 @@
             margin: 0;
             padding: 0;
             background-color: #020617; /* slate-950 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
             overflow: hidden;
+            font-family: 'Inter', sans-serif;
         }
         
-        #game-container {
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            max-width: 1280px;
+            max-height: 100vh;
+            aspect-ratio: 16 / 9;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
             display: none; /* Hidden until game starts */
-            width: 100vw;
-            height: 100vh;
+            background: #000;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            border: 4px solid #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background-color: #000;
+        }
+
+        /* VN UI OVERLAY */
+        #vn-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none; /* Allow clicks to pass to canvas unless over UI */
+            z-index: 20;
+            display: none;
+        }
+
+        /* Overlay untuk elemen visual novel (Dialogue Box) */
+        .vn-dialog-layer {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 150px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 2px solid #4ecca3;
+            padding: 20px;
+            pointer-events: none; /* Biarkan klik menembus ke Phaser */
+            display: none; /* Aktifkan saat ada dialog */
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        #character-name-box {
+            position: absolute;
+            top: -25px;
+            left: 20px;
+            padding: 8px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .name-raka { background: #2563eb; border-left: 4px solid #60a5fa; }
+        .name-adrian { background: #b45309; border-left: 4px solid #fbbf24; }
+
+        #dialogue-text {
+            color: #f1f5f9;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Task Panel Pop-out */
+        #task-panel {
+            position: absolute;
+            top: 20px;
+            left: -280px; /* Hidden by default */
+            width: 300px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 0 12px 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+            padding: 20px;
+        }
+
+        #task-panel.active {
+            left: 0;
+        }
+
+        #task-panel-trigger {
+            position: absolute;
+            right: -40px;
+            top: 0;
+            width: 40px;
+            height: 60px;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+            color: white;
+        }
+
+        /* Suspicion Meter */
+        #suspicion-meter-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 250px;
+            pointer-events: auto;
+        }
+
+        .meter-label {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        #suspicion-bar-wrapper {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #suspicion-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #22c55e, #ef4444);
+            transition: width 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulse-warning {
+            animation: pulse 1s infinite ease-in-out;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
         }
 
         .font-serif { font-family: 'Playfair Display', serif; }
@@ -98,7 +251,48 @@
     </div>
 
     <!-- PHASER GAME CONTAINER -->
-    <div id="game-container"></div>
+    <div id="game-wrapper">
+        <div id="game-container"></div>
+        
+        <!-- VN UI OVERLAY LAYER -->
+        <div id="vn-overlay">
+            <!-- Task Panel (Pop-out) -->
+            <div id="task-panel">
+                <div id="task-panel-trigger">
+                    <span id="trigger-icon">◀</span>
+                </div>
+                <h3 class="font-sans text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">Tugas Magang</h3>
+                <ul id="task-list" class="space-y-3 text-sm text-slate-300">
+                    <li class="flex items-center space-x-2">
+                        <div class="h-2 w-2 rounded-full bg-slate-700"></div>
+                        <span>Verifikasi Berkas</span>
+                    </li>
+                    <li class="flex items-center space-x-2">
+                        <div class="h-2 w-2 rounded-full bg-slate-700"></div>
+                        <span>Sortir Email</span>
+                    </li>
+                    <li class="flex items-center space-x-2">
+                        <div class="h-2 w-2 rounded-full bg-slate-700"></div>
+                        <span>Rekap Surat</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Suspicion Meter -->
+            <div id="suspicion-meter-container">
+                <span class="meter-label font-mono">Suspicion Level</span>
+                <div id="suspicion-bar-wrapper">
+                    <div id="suspicion-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Dialogue Box -->
+            <div id="dialogue-box" class="vn-dialog-layer">
+                <div id="character-name-box" class="name-raka">Raka</div>
+                <p id="dialogue-text"></p>
+            </div>
+        </div>
+    </div>
     
     <!-- Data & Utils -->
     <script src="js/data/gameState.js"></script>
@@ -123,12 +317,14 @@
     <script>
         document.getElementById('btn-start').addEventListener('click', () => {
             const menu = document.getElementById('main-menu');
-            const gameContainer = document.getElementById('game-container');
+            const gameWrapper = document.getElementById('game-wrapper');
+            const vnOverlay = document.getElementById('vn-overlay');
             
             menu.style.opacity = '0';
             setTimeout(() => {
                 menu.style.display = 'none';
-                gameContainer.style.display = 'block';
+                gameWrapper.style.display = 'block';
+                vnOverlay.style.display = 'block';
                 
                 // Beritahu Phaser untuk mulai
                 if (window.gameInstance) {
@@ -138,6 +334,16 @@
                     }
                 }
             }, 1000);
+        });
+
+        // Task Panel Toggle
+        const taskPanel = document.getElementById('task-panel');
+        const taskTrigger = document.getElementById('task-panel-trigger');
+        const triggerIcon = document.getElementById('trigger-icon');
+
+        taskTrigger.addEventListener('click', () => {
+            taskPanel.classList.toggle('active');
+            triggerIcon.textContent = taskPanel.classList.contains('active') ? '▶' : '◀';
         });
 
         document.getElementById('btn-exit').addEventListener('click', () => {
