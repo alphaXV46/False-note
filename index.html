@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FALSE NOTE - The Silent Witness</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="intro-screen" id="intro-screen">
+        <div class="intro-copy">
+          <p class="eyebrow">FH UI / Legal Debate Simulator</p>
+          <h1>FALSE NOTE</h1>
+          <p class="subtitle">The Silent Witness</p>
+          <p>
+            Mainkan kisah Kirana Maharani dalam format dialog ala courtroom:
+            dengarkan klaim, kumpulkan bukti, lalu tekan <b>SANGGAH!</b> saat
+            pernyataan lawan mulai runtuh.
+          </p>
+          <div class="intro-actions">
+            <button class="primary-btn" id="start-game">Mulai Episode 1</button>
+            <button class="ghost-btn" id="continue-game">Lanjutkan Save</button>
+          </div>
+        </div>
+
+        <div class="intro-stage" aria-hidden="true">
+          <div class="faculty-seal">FH UI</div>
+          <div class="intro-person intro-kirana"></div>
+          <div class="intro-person intro-adrian"></div>
+          <div class="intro-bubble">EITSSSSS!</div>
+        </div>
+      </section>
+
+      <section class="game-screen is-hidden" id="game-screen">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="case-label">Episode 1</p>
+            <h2 id="case-title">Memo yang Salah Diam</h2>
+          </div>
+          <div class="score-row" aria-label="Status pemain">
+            <div><span>Integritas</span><strong id="integrity-score">75</strong></div>
+            <div><span>Reputasi</span><strong id="reputation-score">60</strong></div>
+            <div><span>Bukti</span><strong id="evidence-score">0</strong></div>
+          </div>
+        </header>
+
+        <div class="game-layout">
+          <aside class="case-panel">
+            <div class="panel-title">
+              <span>Case Files</span>
+              <button class="mini-btn" id="save-game">Save</button>
+            </div>
+            <div class="case-list" id="case-list"></div>
+            <div class="vault">
+              <div class="panel-title">
+                <span>Evidence</span>
+                <i id="evidence-count">0/5</i>
+              </div>
+              <div id="evidence-list" class="evidence-list"></div>
+            </div>
+          </aside>
+
+          <section class="stage-panel">
+            <div class="scene-name" id="scene-name">Ruang Magang FH UI</div>
+            <div class="stage" id="stage">
+              <div class="backdrop"></div>
+              <div class="bench"></div>
+              <div class="sprite-slot left">
+                <div class="sprite" id="left-sprite"></div>
+                <span id="left-name"></span>
+              </div>
+              <div class="sprite-slot right">
+                <div class="sprite" id="right-sprite"></div>
+                <span id="right-name"></span>
+              </div>
+              <div class="impact-word is-hidden" id="impact-word">SANGGAH!</div>
+            </div>
+
+            <div class="dialogue-box">
+              <div class="speaker-row">
+                <strong id="speaker-name">Kirana</strong>
+                <span id="mood-label">tenang</span>
+              </div>
+              <p id="dialogue-text"></p>
+              <div class="action-area" id="action-area"></div>
+            </div>
+          </section>
+
+          <aside class="profile-panel">
+            <div class="profile-card" id="active-profile"></div>
+            <div class="notes-card">
+              <span>Nota Saku Kirana</span>
+              <p id="case-note">
+                Cari kontradiksi, jangan manipulasi bukti, dan jaga beasiswa.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="ending-screen is-hidden" id="ending-screen">
+        <div class="ending-card">
+          <p class="eyebrow">Forum Fakultas / Putusan Akhir</p>
+          <h2 id="ending-title">True Ending</h2>
+          <p id="ending-body"></p>
+          <div class="final-score" id="final-score"></div>
+          <button class="primary-btn" id="restart-game">Main Lagi</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
