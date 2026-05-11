@@ -29,6 +29,11 @@ export default class AfternoonScene extends Phaser.Scene {
 
     // Background placeholder (warna solid)
     this.cameras.main.setBackgroundColor('#16213e');
+    this.add.rectangle(480, 270, 960, 540, 0x1a1a2e); // warna per lokasi
+
+    // Sprite placeholders
+    this.add.rectangle(200, 350, 128, 256, 0x0000ff); // Raka idle (biru)
+    this.add.rectangle(760, 350, 128, 256, 0xff0000); // Dr. Adrian (merah)
 
     // Label periode
     this.add.text(width / 2, 110, '🌤️ SIANG', {
