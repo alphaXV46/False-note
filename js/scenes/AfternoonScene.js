@@ -7,6 +7,7 @@
 // ===============================
 import gameState from '../managers/GameState.js';
 import MiniGameManager from '../managers/MiniGameManager.js';
+import { typewriterText } from '../utils/typewriter.js';
 
 export default class AfternoonScene extends Phaser.Scene {
   constructor() {
@@ -59,25 +60,22 @@ export default class AfternoonScene extends Phaser.Scene {
       fontStyle: 'bold'
     });
 
-    this.dialogText = this.add.text(30, height - 110, '', {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '14px',
-      color: '#ffffff',
-      wordWrap: { width: width - 80 },
-      lineSpacing: 6
-    });
-
     this.continueHint = this.add.text(width - 30, height - 30, '▶ Klik untuk lanjut', {
       fontFamily: 'Inter, sans-serif',
       fontSize: '11px',
       color: '#888888'
     }).setOrigin(1, 1);
+    this.continueHint.setVisible(false);
 
     this._currentDialogIndex = 0;
+    this._isTyping = false;
+    this._currentTypewriter = null;
     this._showNextDialog();
 
     this.input.on('pointerdown', () => {
-      this._advanceDialog(afternoon);
+      if (!this._isTyping) {
+        this._advanceDialog(afternoon);
+      }
     });
   }
 
@@ -94,7 +92,26 @@ export default class AfternoonScene extends Phaser.Scene {
     if (this._currentDialogIndex >= this._dialogQueue.length) return;
     const entry = this._dialogQueue[this._currentDialogIndex];
     this.speakerText.setText(entry.speaker);
-    this.dialogText.setText(entry.text);
+    
+    if (this._currentTypewriter && this._currentTypewriter.textObj) {
+      this._currentTypewriter.textObj.destroy();
+    }
+
+    this.continueHint.setVisible(false);
+    this._isTyping = true;
+
+    this._currentTypewriter = typewriterText(
+      this,
+      30,
+      this.cameras.main.height - 110,
+      entry.text,
+      30,
+      {},
+      () => {
+        this._isTyping = false;
+        this.continueHint.setVisible(true);
+      }
+    );
   }
 
   _advanceDialog(afternoonData) {
@@ -124,7 +141,9 @@ export default class AfternoonScene extends Phaser.Scene {
     // Bersihkan dialog
     this.dialogBox.setVisible(false);
     this.speakerText.setVisible(false);
-    this.dialogText.setVisible(false);
+    if (this._currentTypewriter && this._currentTypewriter.textObj) {
+      this._currentTypewriter.textObj.destroy();
+    }
     this.continueHint.setVisible(false);
 
     const mgm = new MiniGameManager({
