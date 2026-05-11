@@ -24,4 +24,5 @@ const config = {
 };
 
 // Start Game
-const game = new Phaser.Game(config);
+window.gameInstance = new Phaser.Game(config);
+

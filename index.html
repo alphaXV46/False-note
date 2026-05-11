@@ -4,30 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>False Note - Game Integritas Mahasiswa</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Roboto:wght@300;400;700&family=Courier+Prime&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #0a0f1e;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: #020617; /* slate-950 */
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
         }
+        
         #game-container {
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            border: 2px solid #1a233a;
-            border-radius: 8px;
-            overflow: hidden;
+            display: none; /* Hidden until game starts */
+            width: 100vw;
+            height: 100vh;
         }
+
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-sans { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'Courier Prime', monospace; }
     </style>
+    
     <!-- Phaser Library -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-950">
+    
+    <!-- MAIN MENU LAYER -->
+    <div id="main-menu" class="relative h-screen w-screen overflow-hidden bg-slate-950 transition-opacity duration-1000">
+        
+        <!-- BACKGROUND ASSET (Hasil AI) -->
+        <img src="assets/images/menu_bg.png" class="absolute inset-0 h-full w-full object-cover opacity-60" alt="Background">
+
+        <!-- OVERLAY GRADIENT -->
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent"></div>
+
+        <!-- CONTENT LAYER -->
+        <div class="relative z-10 flex h-full flex-col justify-center px-12 md:px-24">
+            
+            <!-- JUDUL GAME -->
+            <div class="mb-12">
+                <h1 class="font-serif text-8xl font-bold tracking-tighter text-white">
+                    FALSE <span class="text-red-600 animate-pulse">NOTE</span>
+                </h1>
+                <div class="mt-2 h-1 w-32 bg-yellow-500"></div>
+                <p class="mt-4 font-mono text-sm tracking-[0.3em] text-slate-400 uppercase">
+                    The Silent Witness // Investigation Module v1.0
+                </p>
+            </div>
+
+            <!-- NAVIGATION MENU -->
+            <nav class="flex flex-col space-y-6">
+                <!-- Tombol Start -->
+                <button id="btn-start" class="group flex items-center space-x-4 text-left transition-all">
+                    <div class="h-10 w-1 bg-red-600 opacity-0 transition-all group-hover:opacity-100"></div>
+                    <span class="font-sans text-3xl font-light tracking-widest text-white transition-all group-hover:pl-4 group-hover:text-red-600 uppercase">
+                        Mulai Investigasi
+                    </span>
+                </button>
+
+                <!-- Tombol Load -->
+                <button id="btn-load" class="group flex items-center space-x-4 text-left transition-all">
+                    <div class="h-10 w-1 bg-white opacity-0 transition-all group-hover:opacity-100"></div>
+                    <span class="font-sans text-2xl font-light tracking-widest text-slate-400 transition-all group-hover:pl-4 group-hover:text-white uppercase">
+                        Buka Arsip Kasus
+                    </span>
+                </button>
+
+                <!-- Tombol Exit -->
+                <button id="btn-exit" class="group flex items-center space-x-4 text-left transition-all">
+                    <div class="h-10 w-1 bg-white opacity-0 transition-all group-hover:opacity-100"></div>
+                    <span class="font-sans text-2xl font-light tracking-widest text-slate-400 transition-all group-hover:pl-4 group-hover:text-white uppercase">
+                        Keluar
+                    </span>
+                </button>
+            </nav>
+
+            <!-- FOOTER INFO -->
+            <div class="absolute bottom-10 left-12 md:left-24">
+                <p class="font-mono text-xs text-slate-600">
+                    &copy; 2026 NUSANTARA SANG PENJAGA AMANAH. All Rights Reserved. <br>
+                    Authorized Access Only.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASER GAME CONTAINER -->
     <div id="game-container"></div>
     
     <!-- Data & Utils -->
@@ -48,5 +118,38 @@
 
     <!-- Entry Point -->
     <script src="js/main.js"></script>
+
+    <!-- Menu Logic -->
+    <script>
+        document.getElementById('btn-start').addEventListener('click', () => {
+            const menu = document.getElementById('main-menu');
+            const gameContainer = document.getElementById('game-container');
+            
+            menu.style.opacity = '0';
+            setTimeout(() => {
+                menu.style.display = 'none';
+                gameContainer.style.display = 'block';
+                
+                // Beritahu Phaser untuk mulai
+                if (window.gameInstance) {
+                    const preloadScene = window.gameInstance.scene.getScene('PreloadScene');
+                    if (preloadScene) {
+                        preloadScene.transitionTo('MorningScene');
+                    }
+                }
+            }, 1000);
+        });
+
+        document.getElementById('btn-exit').addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                window.close();
+            }
+        });
+        
+        document.getElementById('btn-load').addEventListener('click', () => {
+            alert('Fitur Arsip Kasus segera hadir!');
+        });
+    </script>
 </body>
 </html>
+
