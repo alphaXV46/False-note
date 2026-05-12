@@ -1,0 +1,47 @@
+{
+  "bukti_potongan": {
+    "name": "Email Potongan",
+    "desc": "Email admin meminta potongan 10 persen dari dana beasiswa.",
+    "hint": "Sanggah klaim tidak ada pungli."
+  },
+  "bukti_selisih": {
+    "name": "Selisih Anggaran",
+    "desc": "Laporan tertulis 500 juta, real note hanya 300 juta.",
+    "hint": "Sanggah klaim dana sudah sesuai."
+  },
+  "rekam_bicara_bella": {
+    "name": "Rekaman Bella",
+    "desc": "Bella menyebut fee admin secara eksplisit.",
+    "hint": "Sanggah penyangkalan keterlibatan Bella."
+  },
+  "screenshot_chat_admin": {
+    "name": "Screenshot Chat Admin",
+    "desc": "Chat admin mengarahkan mahasiswa untuk transfer ke rekening pribadi.",
+    "hint": "Sanggah klaim prosedur resmi."
+  },
+  "kuitansi_fiktif": {
+    "name": "Kuitansi Fiktif",
+    "desc": "Kuitansi pengeluaran acara dibuat untuk kegiatan yang tidak pernah terjadi.",
+    "hint": "Sanggah klaim semua kegiatan terlaksana."
+  },
+  "false_note_decrypted": {
+    "name": "FALSE_NOTE.sys",
+    "desc": "File terenkripsi berisi seluruh transaksi ilegal.",
+    "hint": "Bukti utama untuk sidang hari ke-7."
+  },
+  "audit_metadata": {
+    "name": "Metadata Audit",
+    "desc": "Log laptop menunjukkan dokumen audit diedit setelah tanggal pengesahan.",
+    "hint": "Pakai untuk membuktikan audit palsu."
+  },
+  "arsip_pencairan": {
+    "name": "Map Arsip Pencairan",
+    "desc": "Map arsip berisi salinan pencairan yang tidak cocok dengan laporan final.",
+    "hint": "Pakai untuk menantang dokumen audit."
+  },
+  "flashdisk_log": {
+    "name": "Flashdisk Log",
+    "desc": "Flashdisk berisi backup transaksi dan jejak revisi dokumen.",
+    "hint": "Bukti kuat saat dokumen terlihat terlalu rapi."
+  }
+}

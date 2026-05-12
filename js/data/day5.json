@@ -1,0 +1,59 @@
+{
+  "day": 5,
+  "titleCard": "HARI KE-5: Semua Orang Tahu, Tidak Ada yang Bicara",
+  "headlineMorning": "File Terenkripsi Berhasil Dibuka",
+  "headlineEvening": "Netizen Terbelah: #PercayaRaka vs #BuzzerGajian",
+  "headlineEveningResult": "FALSE_NOTE.sys Jadi Kunci Kasus",
+  "morning": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Raka", "text": ["File ini terkunci.", "Namanya FALSE_NOTE.sys."]},
+      {"speaker": "Sistem", "text": ["Satu sandi tersisa.", "Satu risiko besar menunggu."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih petunjuk sandi yang benar.",
+      "options": [
+        {"text": "Tanggal ulang tahun Adrian", "isCorrect": false, "feedbackWrong": "Terlalu mudah ditebak."},
+        {"text": "Kode transaksi berulang 10-40-50", "isCorrect": true, "evidenceGain": "false_note_decrypted", "feedbackRight": "File terbuka. Transaksi ilegal terlihat lengkap."}
+      ]
+    },
+    "suspicionGain": 12,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Data sudah cukup banyak.", "Tapi aku harus teliti."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih transaksi yang muncul berkali-kali.",
+      "options": [
+        {"text": "Transfer fee admin ke rekening sama", "isCorrect": true, "feedbackRight": "Pola berulang memperkuat dugaan."},
+        {"text": "Pembelian alat tulis fakultas", "isCorrect": false, "feedbackWrong": "Pembelian ini masih wajar."}
+      ]
+    },
+    "suspicionGain": 9,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Semua staf setuju.", "Masa kamu sendiri yang tidak?"]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Bandwagon",
+      "fallacyExplanation": "Bandwagon menganggap sesuatu benar karena banyak orang setuju.",
+      "fallacyCounterTip": "Jumlah pendukung bukan bukti. Periksa datanya.",
+      "statements": [
+        {"text": "Semua staf setuju. Masa kamu sendiri yang tidak?", "fallacy": "Bandwagon"}
+      ],
+      "correctEvidence": "false_note_decrypted",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Mayoritas bisa salah. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

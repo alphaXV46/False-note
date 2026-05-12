@@ -1,43 +1,81 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>False Note - Game Integritas</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0a0f1e;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        #game-container {
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            border: 2px solid #1a233a;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FALSE NOTE - The Silent Witness</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container"></div>
-    
-    <!-- Game Scripts -->
-    <script src="src/GameState.js"></script>
-    <script src="src/scenes/BaseScene.js"></script>
-    <script src="src/scenes/BootScene.js"></script>
-    <script src="src/scenes/PreloadScene.js"></script>
-    <script src="src/scenes/MorningScene.js"></script>
-    <script src="src/scenes/AfternoonScene.js"></script>
-    <script src="src/scenes/EveningScene.js"></script>
-    <script src="src/scenes/ResultScene.js"></script>
-    <script src="src/scenes/GameOverScene.js"></script>
-    <script src="src/main.js"></script>
+  <main id="app">
+    <section id="game-screen" class="screen bg-office">
+      <div class="shade"></div>
+
+      <aside class="status-panel hidden" id="status-panel">
+        <div class="bar-group">
+          <span>INTEGRITY</span>
+          <div class="bar"><i id="integrity-bar"></i></div>
+          <b id="integrity-text">100</b>
+        </div>
+        <div class="bar-group">
+          <span>SUSPICION</span>
+          <div class="bar danger"><i id="suspicion-bar"></i></div>
+          <b id="suspicion-text">0</b>
+        </div>
+      </aside>
+
+      <aside class="inventory hidden" id="inventory">
+        <h2>Inventory</h2>
+        <div id="inventory-slots"></div>
+      </aside>
+
+      <section id="main-menu" class="main-menu">
+        <p class="subtitle">The Silent Witness</p>
+        <h1>FALSE <span>NOTE</span></h1>
+        <nav class="menu-buttons">
+          <button data-action="start">START</button>
+          <button data-action="load">LOAD</button>
+          <button data-action="setting">SETTING</button>
+          <button data-action="exit">KELUAR</button>
+        </nav>
+      </section>
+
+      <section id="content-layer" class="content-layer hidden"></section>
+
+      <section id="character-stage" class="character-stage hidden" aria-hidden="true"></section>
+
+      <section id="dialogue-box" class="dialogue-box hidden">
+        <div id="speaker-name" class="speaker-name">Raka</div>
+        <p id="dialogue-text"></p>
+        <button id="dialogue-next">NEXT</button>
+      </section>
+
+      <div id="eitssss-layer" class="eitssss-layer hidden">
+        <div class="white-flash"></div>
+        <img src="assets/ui/eitssss.png" alt="EITSSSS!" class="eitssss-logo">
+      </div>
+
+      <section id="setting-panel" class="setting-panel hidden">
+        <h2>SETTING</h2>
+        <label class="setting-row">
+          <span>Volume</span>
+          <button id="volume-toggle">ON</button>
+        </label>
+        <label class="setting-row">
+          <span>Text Speed</span>
+          <select id="text-speed">
+            <option value="slow">Slow</option>
+            <option value="normal" selected>Normal</option>
+            <option value="fast">Fast</option>
+          </select>
+        </label>
+        <button id="setting-close">Close</button>
+      </section>
+
+      <div id="toast" class="toast hidden"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>

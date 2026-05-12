@@ -1,0 +1,60 @@
+{
+  "day": 7,
+  "titleCard": "HARI KE-7: Saatnya Bicara",
+  "headlineMorning": "Sidang Internal FH Hari Ini",
+  "headlineEvening": "Seluruh Kampus Menunggu Keputusan",
+  "headlineEveningResult": "Raka Membawa Bukti ke Sidang",
+  "morning": {
+    "background": "bg_sidang",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Pintu sidang terbuka.", "Semua mata menunggu Raka."]},
+      {"speaker": "Raka", "text": ["Aku tidak boleh goyah.", "Hari ini semuanya dibuka."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih berkas yang harus dibawa pertama.",
+      "options": [
+        {"text": "Kumpulan bukti transaksi", "isCorrect": true, "feedbackRight": "Data utama siap dibacakan."},
+        {"text": "Opini netizen paling viral", "isCorrect": false, "feedbackWrong": "Sidang membutuhkan bukti, bukan sorakan."}
+      ]
+    },
+    "suspicionGain": 6,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_sidang",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Nilaimu pernah turun.", "Kamu bukan orang kredibel."]},
+      {"speaker": "Raka", "text": ["Nilai bukan isi laporan.", "Mari bicara data."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih opsi klimaks.",
+      "options": [
+        {"text": "Laporkan ke Rektor", "isCorrect": true, "feedbackRight": "Laporan resmi diterima."},
+        {"text": "Sebar semua data mentah ke forum", "isCorrect": false, "feedbackWrong": "Data korban harus dilindungi."}
+      ]
+    },
+    "suspicionGain": 5,
+    "integrityCostIfWrong": 15
+  },
+  "evening": {
+    "background": "bg_sidang",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Nilai kamu jelek.", "Jangan mengurus dana orang lain."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Red Herring",
+      "fallacyExplanation": "Red Herring mengalihkan topik utama ke isu lain.",
+      "fallacyCounterTip": "Kembalikan diskusi ke bukti kasus.",
+      "statements": [
+        {"text": "Nilai kamu jelek. Jangan ngurus dana orang lain.", "fallacy": "Red Herring"}
+      ],
+      "correctEvidence": "false_note_decrypted",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Topikmu dibelokkan. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

@@ -1,0 +1,59 @@
+{
+  "day": 3,
+  "titleCard": "HARI KE-3: Senjata Paling Tajam Adalah Data",
+  "headlineMorning": "Dr. Adrian Bantah Semua Tuduhan",
+  "headlineEvening": "Mahasiswa UI Diklaim Cari Perhatian",
+  "headlineEveningResult": "Forum Kampus Menuntut Bukti Baru",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Dimas", "text": ["Raka, rumor makin panas.", "Kamu yakin lanjut?"]},
+      {"speaker": "Raka", "text": ["Kalau data benar, aku lanjut.", "Takut bukan alasan diam."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih lampiran yang perlu dibuka.",
+      "options": [
+        {"text": "Poster seminar hukum bisnis", "isCorrect": false, "feedbackWrong": "Lampiran itu tidak terkait kasus."},
+        {"text": "Audio rapat beasiswa tertutup", "isCorrect": true, "evidenceGain": "rekam_bicara_bella", "feedbackRight": "Bella menyebut fee admin dengan jelas."}
+      ]
+    },
+    "suspicionGain": 9,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_balairung",
+    "dialog": [
+      {"speaker": "Raka", "text": ["Rekaman cocok dengan memo.", "Nama yang sama muncul lagi."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih catatan yang mendukung rekaman.",
+      "options": [
+        {"text": "Daftar hadir rapat umum", "isCorrect": false, "feedbackWrong": "Daftar hadir belum cukup."},
+        {"text": "Catatan fee admin 40 persen", "isCorrect": true, "feedbackRight": "Catatan ini memperkuat rekaman Bella."}
+      ]
+    },
+    "suspicionGain": 9,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Sejak kamu protes,", "dana beasiswa malah seret.", "Lihat akibat ulahmu."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "False Cause",
+      "fallacyExplanation": "False Cause menganggap satu kejadian pasti menyebabkan kejadian lain.",
+      "fallacyCounterTip": "Minta hubungan sebab akibat yang terbukti, bukan kebetulan waktu.",
+      "statements": [
+        {"text": "Sejak kamu protes, dana beasiswa malah seret.", "fallacy": "False Cause"}
+      ],
+      "correctEvidence": "rekam_bicara_bella",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu menerima sebab-akibat palsu. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}
