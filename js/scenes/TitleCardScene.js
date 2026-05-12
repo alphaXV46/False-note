@@ -30,27 +30,28 @@ export default class TitleCardScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#000000');
 
     // ===============================
-    // FASE 1: Title Card (3 detik)
+    // FASE 1: Title Card (5 detik - diperlama)
     // ===============================
     const titleText = this.add.text(width / 2, height / 2, dayData.titleCard, {
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '32px',
+      fontFamily: 'Crimson Text, serif',
+      fontSize: '42px',
       color: '#ffffff',
-      fontStyle: 'bold',
+      fontStyle: '600',
       align: 'center',
       wordWrap: { width: width - 80 }
-    }).setOrigin(0.5).setAlpha(0);
+    }).setOrigin(0.5).setAlpha(0).setScale(0.95);
 
-    // Fade in title
+    // Fade in + subtle scale title
     this.tweens.add({
       targets: titleText,
       alpha: 1,
-      duration: 500,
-      ease: 'Power2'
+      scale: 1,
+      duration: 1500,
+      ease: 'Cubic.easeOut'
     });
 
-    // Setelah 3 detik, ganti ke headline
-    this.time.delayedCall(3000, () => {
+    // Setelah 5 detik, ganti ke headline
+    this.time.delayedCall(5000, () => {
       this._showHeadline(dayData, titleText);
     });
   }
@@ -67,40 +68,54 @@ export default class TitleCardScene extends Phaser.Scene {
     this.tweens.add({
       targets: previousText,
       alpha: 0,
-      duration: 300,
+      duration: 800,
       ease: 'Power2',
       onComplete: () => {
         previousText.destroy();
 
         // Label koran
-        const headerLabel = this.add.text(width / 2, height / 2 - 40, '📰 BERITA PAGI', {
+        const headerLabel = this.add.text(width / 2, height / 2 - 60, '📰 BERITA PAGI', {
           fontFamily: 'Inter, sans-serif',
-          fontSize: '14px',
+          fontSize: '16px',
           color: '#fbbf24',
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          letterSpacing: 4
         }).setOrigin(0.5).setAlpha(0);
 
         // Headline text
         const headlineText = this.add.text(width / 2, height / 2, `"${dayData.headlineMorning}"`, {
-          fontFamily: 'Georgia, serif',
-          fontSize: '22px',
+          fontFamily: 'Crimson Text, serif',
+          fontSize: '28px',
           color: '#ffffff',
           fontStyle: 'italic',
           align: 'center',
-          wordWrap: { width: width - 100 }
-        }).setOrigin(0.5).setAlpha(0);
+          wordWrap: { width: width - 120 }
+        }).setOrigin(0.5).setAlpha(0).setScale(1.05);
 
-        // Fade in headline
+        // Fade in headline + subtle scale down
         this.tweens.add({
           targets: [headerLabel, headlineText],
           alpha: 1,
-          duration: 500,
+          duration: 1000,
           ease: 'Power2'
         });
+        
+        this.tweens.add({
+            targets: headlineText,
+            scale: 1,
+            duration: 5000,
+            ease: 'Linear'
+        });
 
-        // Setelah 3 detik, lanjut ke MorningScene
-        this.time.delayedCall(3000, () => {
-          this.scene.start('MorningScene');
+        // Setelah 5 detik, tampilkan placeholder baru lanjut ke MorningScene
+        this.time.delayedCall(5000, () => {
+          if (window.showPlaceholder) {
+            window.showPlaceholder(() => {
+              this.scene.start('MorningScene');
+            });
+          } else {
+            this.scene.start('MorningScene');
+          }
         });
       }
     });

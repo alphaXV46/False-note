@@ -77,10 +77,20 @@ export default class BootScene extends Phaser.Scene {
 
     console.log('[BootScene] Semua data dimuat dan divalidasi.');
 
-    // Launch UIScene secara paralel (berjalan di atas semua scene)
+    // Launch UIScene secara paralel
     this.scene.launch('UIScene');
 
-    // Lanjut ke TitleCardScene hari pertama
-    this.scene.start('TitleCardScene');
+    // TUNGGU SINYAL DARI MENU HTML (index.html)
+    const checkStartSignal = () => {
+      if (window.canStartGame) {
+        // Langsung ke MorningScene karena Title Card & Headline sudah ditangani DOM
+        this.scene.start('MorningScene');
+      } else {
+        // Cek lagi setiap 100ms
+        this.time.delayedCall(100, checkStartSignal);
+      }
+    };
+
+    checkStartSignal();
   }
 }

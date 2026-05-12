@@ -14,6 +14,17 @@ import EveningScene from './scenes/EveningScene.js';
 import ResultScene from './scenes/ResultScene.js';
 import EndingScene from './scenes/EndingScene.js';
 
+// Import managers untuk diakses oleh Menu HTML
+import gameState from './managers/GameState.js';
+import saveLoadManager from './managers/SaveLoadManager.js';
+
+// Ekspos ke window agar bisa dipanggil dari index.html
+window.gameState = gameState;
+window.saveLoadManager = saveLoadManager;
+
+// Flag untuk menunda start game sampai transisi DOM selesai
+window.canStartGame = false;
+
 // ===============================
 // KONFIGURASI PHASER
 // ===============================
@@ -28,8 +39,8 @@ const config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   scene: [
-    MenuScene,
     BootScene,
+    MenuScene,
     UIScene,
     TitleCardScene,
     MorningScene,
