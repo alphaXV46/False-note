@@ -1,18 +1,21 @@
 // ===============================
-// FALSE NOTE - Vanilla JS Version
-// DESKRIPSI:
-// Mengatur flow visual novel, prolog, case,
-// puzzle investigasi, debat, save/load, dan ending.
+// FALSE NOTE - Lore Baru
+// Flow: Orientasi -> Investigasi -> Analisis -> Sidang
 // ===============================
 
 let integrity = 100;
 let suspicion = 0;
 let evidence = [];
-let unlockedCase = 1;
-let currentCase = 1;
+let currentPhase = 1;
+let investigationStep = 0;
+let twistUnlocked = false;
+let reportedSuspects = [];
 
 let volumeOn = true;
 let textSpeed = 'normal';
+let isPaused = false;
+let flowToken = 0;
+let pauseCallbacks = [];
 
 const SAVE_KEY = 'false_note_vanilla_save';
 
@@ -23,30 +26,340 @@ const speedMap = {
 };
 
 const evidenceDatabase = {
-  email_potongan: {
-    id: 'email_potongan',
-    name: 'Email Potongan',
-    desc: 'Email yang menyebut potongan 10 persen sebagai biaya administrasi.',
-    hint: 'Bantah klaim biaya administrasi biasa.'
+  doc_anggaran_manipulasi: {
+    id: 'doc_anggaran_manipulasi',
+    name: 'Dokumen Anggaran Q3',
+    desc: 'Dokumen anggaran Q3 menunjukkan angka yang diubah dari lampiran audit.',
+    linkedSuspect: 'hendra',
+    hint: 'Sanggah klaim anggaran sudah sesuai prosedur.'
   },
-  selisih_anggaran: {
-    id: 'selisih_anggaran',
-    name: 'Selisih Anggaran',
-    desc: 'Laporan resmi 500 juta, realisasi hanya 300 juta.',
-    hint: 'Bantah klaim revisi teknis.'
+  kontrak_vendor_fiktif: {
+    id: 'kontrak_vendor_fiktif',
+    name: 'Kontrak Vendor Fiktif',
+    desc: 'Kontrak memakai vendor yang tidak terdaftar di basis data pengadaan.',
+    linkedSuspect: 'sinta',
+    hint: 'Sanggah klaim semua vendor sudah diverifikasi.'
   },
-  log_server: {
-    id: 'log_server',
-    name: 'Log Server',
-    desc: 'Log akses malam hari ke folder audit.',
-    hint: 'Bantah klaim tidak ada akses ilegal.'
+  stempel_jeki_palsu: {
+    id: 'stempel_jeki_palsu',
+    name: 'Stempel Jeki Palsu',
+    desc: 'Stempel atas nama Jeki ternyata dipalsukan untuk menjebaknya.',
+    linkedSuspect: 'twist_jeki_framed',
+    hint: 'Buktikan Jeki tidak menandatangani dokumen korup secara sadar.'
   },
-  false_note_sys: {
-    id: 'false_note_sys',
-    name: 'FALSE_NOTE.sys',
-    desc: 'File utama berisi rangkaian transaksi dan revisi palsu.',
-    hint: 'Bukti utama di sidang internal.'
+  chat_instruksi_hendra: {
+    id: 'chat_instruksi_hendra',
+    name: 'Instruksi Hendra',
+    desc: 'Pesan Hendra ke Sinta meminta angka laporan disesuaikan.',
+    linkedSuspect: 'hendra',
+    hint: 'Buktikan instruksi korup datang dari atas.'
+  },
+  chat_jeki_dipaksa: {
+    id: 'chat_jeki_dipaksa',
+    name: 'Jeki Dipaksa Tanda Tangan',
+    desc: 'Pesan Hendra menunjukkan Jeki dipaksa menandatangani laporan.',
+    linkedSuspect: 'twist_jeki_framed',
+    hint: 'Buktikan Jeki korban, bukan pelaku.'
+  },
+  rekening_sinta: {
+    id: 'rekening_sinta',
+    name: 'Rekening Sinta',
+    desc: 'Data transfer mencurigakan mengarah ke rekening pribadi Sinta.',
+    linkedSuspect: 'sinta',
+    hint: 'Sanggah klaim tidak ada aliran dana ilegal.'
   }
+};
+
+const suspects = [
+  {
+    id: 'hendra',
+    name: 'Hendra Kusuma',
+    title: 'Direktur Utama',
+    appearance: 'ramah dan kooperatif',
+    actualRole: 'koruptor',
+    crimes: [
+      'Memanipulasi angka anggaran Q3',
+      'Memberi instruksi perubahan laporan',
+      'Menjebak Jeki sebagai pelaku'
+    ],
+    requiredEvidence: [
+      'doc_anggaran_manipulasi',
+      'chat_instruksi_hendra',
+      'chat_jeki_dipaksa'
+    ],
+    dialogue: {
+      first_meet: [
+        'Silakan periksa semuanya, Raka.',
+        'Saya ingin kasus ini jelas.'
+      ],
+      under_pressure: [
+        'Itu hanya penyesuaian administrasi.',
+        'Jangan salah membaca konteks.'
+      ],
+      final: [
+        'Kalian terlalu percaya kertas.',
+        'Perusahaan ini butuh keputusan cepat.'
+      ]
+    }
+  },
+  {
+    id: 'jeki',
+    name: 'Jeki Saputra',
+    title: 'Kepala Bagian Keuangan',
+    appearance: 'defensif dan mudah marah',
+    actualRole: 'innocent',
+    crimes: [
+      'Menandatangani laporan korup',
+      'Memakai stempel direktur tanpa wewenang',
+      'Menyembunyikan perubahan anggaran'
+    ],
+    requiredEvidence: [
+      'stempel_jeki_palsu',
+      'chat_jeki_dipaksa'
+    ],
+    dialogue: {
+      first_meet: [
+        'Saya tidak mau disudutkan.',
+        'Tanya saja atasan saya.'
+      ],
+      under_pressure: [
+        'Saya memang tanda tangan.',
+        'Tapi saya tidak tahu isinya.'
+      ],
+      final: [
+        'Saya kasar, bukan koruptor.',
+        'Nama saya harus dibersihkan.'
+      ]
+    }
+  },
+  {
+    id: 'sinta',
+    name: 'Sinta Marlina',
+    title: 'Sekretaris Eksekutif',
+    appearance: 'pendiam dan tidak mencolok',
+    actualRole: 'koruptor',
+    crimes: [
+      'Membuat kontrak vendor fiktif',
+      'Menerima transfer dana ilegal',
+      'Menyamarkan instruksi Hendra'
+    ],
+    requiredEvidence: [
+      'kontrak_vendor_fiktif',
+      'rekening_sinta',
+      'chat_instruksi_hendra'
+    ],
+    dialogue: {
+      first_meet: [
+        'Saya hanya mengurus jadwal.',
+        'Dokumen itu bukan keputusan saya.'
+      ],
+      under_pressure: [
+        'Rekening itu salah paham.',
+        'Saya hanya mengikuti arahan.'
+      ],
+      final: [
+        'Saya tidak bekerja sendirian.',
+        'Hendra yang mengatur semuanya.'
+      ]
+    }
+  }
+];
+
+const documents = [
+  {
+    id: 'doc_anggaran_q3',
+    title: 'Laporan Anggaran Q3',
+    content: 'Laporan menyebut realisasi Q3 sebesar Rp 8,4 miliar. Lampiran audit internal mencatat Rp 6,1 miliar. Tanggal pengesahan tertulis 31 September 2026.',
+    isManipulated: true,
+    linkedSuspect: 'hendra',
+    evidenceId: 'doc_anggaran_manipulasi',
+    hint: 'Perhatikan tanggal pengesahan laporan.'
+  },
+  {
+    id: 'doc_kontrak_vendor',
+    title: 'Kontrak Vendor Pengadaan',
+    content: 'Kontrak mencatat PT Surya Abadi Energi sebagai vendor cadangan. Nomor registrasinya tidak muncul di daftar pengadaan. Persetujuan akhir memakai paraf Sinta.',
+    isManipulated: true,
+    linkedSuspect: 'sinta',
+    evidenceId: 'kontrak_vendor_fiktif',
+    hint: 'Perhatikan nama vendor di baris kedua.'
+  },
+  {
+    id: 'doc_laporan_jeki',
+    title: 'Memo Keuangan Jeki',
+    content: 'Memo Jeki meminta verifikasi ulang sebelum laporan ditandatangani. Nomor dokumen cocok dengan arsip resmi. Catatan waktunya konsisten dengan log kantor.',
+    isManipulated: false,
+    linkedSuspect: 'jeki',
+    evidenceId: null,
+    hint: 'Catatan waktunya justru konsisten.'
+  }
+];
+
+const stamps = [
+  {
+    id: 'stamp_direktur_asli',
+    owner: 'Hendra Kusuma',
+    isAuthentic: true,
+    visualHint: 'Nomor registrasi DK-019 terlihat lengkap.',
+    linkedSuspect: 'hendra',
+    evidenceId: null,
+    revealsTwist: false
+  },
+  {
+    id: 'stamp_keuangan_asli',
+    owner: 'Jeki Saputra',
+    isAuthentic: true,
+    visualHint: 'Tertulis Kepala Keuangan, bukan Direktur.',
+    linkedSuspect: 'jeki',
+    evidenceId: null,
+    revealsTwist: false
+  },
+  {
+    id: 'stamp_jeki_palsu',
+    owner: 'Jeki Saputra',
+    isAuthentic: false,
+    visualHint: 'Nomor registrasi hilang dan font miring.',
+    linkedSuspect: 'jeki',
+    evidenceId: 'stempel_jeki_palsu',
+    revealsTwist: true
+  },
+  {
+    id: 'stamp_sekretaris_asli',
+    owner: 'Sinta Marlina',
+    isAuthentic: true,
+    visualHint: 'Lingkar luar rapi dan cap terbaca.',
+    linkedSuspect: 'sinta',
+    evidenceId: null,
+    revealsTwist: false
+  }
+];
+
+const chatGame = {
+  chatLog: [
+    {
+      sender: 'Hendra Kusuma',
+      message: 'Sinta, pastikan angkanya sudah disesuaikan ya.',
+      timestamp: '2026-09-28 20:14'
+    },
+    {
+      sender: 'Sinta Marlina',
+      message: 'Sudah beres, Pak. Vendor cadangan juga aman.',
+      timestamp: '2026-09-28 20:18'
+    },
+    {
+      sender: 'Hendra Kusuma',
+      message: 'Bagus. Transfer operasional jangan lewat rekening utama.',
+      timestamp: '2026-09-28 20:21'
+    },
+    {
+      sender: 'Sinta Marlina',
+      message: 'Saya pakai rekening pribadi seperti arahan.',
+      timestamp: '2026-09-28 20:25'
+    },
+    {
+      sender: 'Hendra Kusuma',
+      message: 'Jeki, kamu yang tanda tangan laporan ini.',
+      timestamp: '2026-09-29 08:05'
+    },
+    {
+      sender: 'Jeki Saputra',
+      message: 'Saya belum melihat lampiran lengkapnya, Pak.',
+      timestamp: '2026-09-29 08:07'
+    },
+    {
+      sender: 'Hendra Kusuma',
+      message: 'Tanda tangan saja. Ini perintah direktur.',
+      timestamp: '2026-09-29 08:09'
+    }
+  ],
+  questions: [
+    {
+      question: 'Siapa yang memberi instruksi mengubah angka?',
+      options: ['Hendra Kusuma', 'Jeki Saputra', 'Sinta Marlina'],
+      correctAnswer: 'Hendra Kusuma',
+      evidenceId: 'chat_instruksi_hendra',
+      feedbackRight: 'Instruksi manipulasi datang dari Hendra.',
+      feedbackWrong: 'Perhatikan pesan pertama dari Hendra.'
+    },
+    {
+      question: 'Siapa yang dipaksa tanda tangan?',
+      options: ['Jeki Saputra', 'Sinta Marlina', 'Hendra Kusuma'],
+      correctAnswer: 'Jeki Saputra',
+      evidenceId: 'chat_jeki_dipaksa',
+      feedbackRight: 'Jeki ditekan untuk menandatangani laporan.',
+      feedbackWrong: 'Baca pesan Hendra kepada Jeki.'
+    },
+    {
+      question: 'Rekening siapa menerima aliran mencurigakan?',
+      options: ['Sinta Marlina', 'Jeki Saputra', 'Hendra Kusuma'],
+      correctAnswer: 'Sinta Marlina',
+      evidenceId: 'rekening_sinta',
+      feedbackRight: 'Sinta memakai rekening pribadinya.',
+      feedbackWrong: 'Cari pesan tentang rekening pribadi.'
+    }
+  ],
+  revealsMoment: 'jeki_framed'
+};
+
+const twistSystem = {
+  twistTriggers: ['stempel_jeki_palsu', 'chat_jeki_dipaksa'],
+  twistDialogue: [
+    ['Bella', [
+      'Raka, tunggu.',
+      'Stempel palsu, Jeki dipaksa.',
+      'Dia tidak tahu apa-apa.'
+    ]],
+    ['Raka', [
+      'Lalu siapa yang menjebaknya?'
+    ]],
+    ['Bella', [
+      'Hendra menjebaknya.',
+      'Jeki cuma tameng.'
+    ]]
+  ],
+  twistAffectsEnding: true
+};
+
+const prologueLines = [
+  'Raka baru bergabung dengan lembaga investigasi.',
+  'Adrian memberi tugas pertamanya: PT. Nusantara Energi.',
+  'Tiga nama muncul di meja kasus.',
+  'Satu terlihat bersalah. Dua bersembunyi rapi.'
+];
+
+const prologueBackgrounds = [
+  'bg-office',
+  'bg-corridor',
+  'bg-library',
+  'bg-court'
+];
+
+const phaseIntro = {
+  1: [
+    ['Adrian', [
+      'Raka, ini tugas pertamamu.',
+      'Selidiki PT. Nusantara Energi.'
+    ]],
+    ['Bella', [
+      'Ada tiga nama utama.',
+      'Jangan nilai dari sikap saja.'
+    ]]
+  ],
+  3: [
+    ['Raka', [
+      'Jeki terlihat paling mencurigakan.'
+    ]],
+    ['Bella', [
+      'Sikap bukan bukti.',
+      'Cocokkan semuanya lagi.'
+    ]]
+  ],
+  4: [
+    ['Adrian', [
+      'Laporkan hanya yang terbukti.',
+      'Sidang ini menentukan semuanya.'
+    ]]
+  ]
 };
 
 const characterAssets = {
@@ -62,146 +375,14 @@ const characterAssets = {
     idle: 'assets/characters/clean/jeki_idle.png',
     talk: 'assets/characters/clean/jeki_talk.png'
   },
+  Adrian: {
+    idle: 'assets/characters/clean/adrian_idle.png',
+    talk: 'assets/characters/clean/adrian_talk.png'
+  },
   'Dr. Adrian': {
     idle: 'assets/characters/clean/adrian_idle.png',
     talk: 'assets/characters/clean/adrian_talk.png'
   }
-};
-
-const cases = [
-  {
-    id: 1,
-    title: 'Email Potongan',
-    bg: 'bg-office',
-    requiredEvidence: 'email_potongan',
-    opponent: 'Lawan',
-    opponentLine: 'Itu hanya biaya administrasi biasa.',
-    success: 'Bukti cocok. Klaim biaya administrasi berhasil dibantah.',
-    fail: 'Bukti lemah. Lawan membalikkan argumen.',
-    dialogue: [
-      ['Raka', ['Email ini terlihat biasa.', 'Tapi bagian bawahnya aneh.']],
-      ['Bella', ['Jangan buka itu terlalu lama.']],
-      ['Raka', ['Kenapa?']],
-      ['Bella', ['Karena semua akses dicatat.']]
-    ],
-    clues: [
-      ['Laptop', 'Inbox admin masih terbuka. Ada email dengan subjek potongan dana.', 'email_potongan', 12, 26],
-      ['Dokumen', 'Dokumen penerima beasiswa terlihat bersih, tetapi lampirannya hilang.', null, 44, 40],
-      ['Sticky Note', 'Catatan: "10 persen jangan ditulis di laporan".', null, 70, 24],
-      ['Map Arsip', 'Map arsip kosong, seperti baru saja dipindahkan.', null, 22, 58],
-      ['Flashdisk', 'Flashdisk terkunci. Labelnya: ADMIN-FEE.', null, 64, 62]
-    ]
-  },
-  {
-    id: 2,
-    title: 'Selisih Anggaran',
-    bg: 'bg-library',
-    requiredEvidence: 'selisih_anggaran',
-    opponent: 'Lawan',
-    opponentLine: 'Angka itu hanya revisi teknis.',
-    success: 'Bukti cocok. Selisih anggaran tidak bisa disebut revisi teknis.',
-    fail: 'Bukti lemah. Selisih itu dianggap kesalahan input.',
-    dialogue: [
-      ['Raka', ['Laporan resmi tertulis lima ratus juta.']],
-      ['Jeki', ['Tapi catatan realisasinya cuma tiga ratus juta.']],
-      ['Raka', ['Selisih dua ratus juta.']],
-      ['Jeki', ['Itu bukan salah ketik, Rak.']]
-    ],
-    clues: [
-      ['Laptop', 'Sheet audit menampilkan formula yang diganti manual.', null, 18, 28],
-      ['Dokumen', 'Dokumen realisasi menunjukkan angka Rp 300.000.000.', 'selisih_anggaran', 48, 42],
-      ['Sticky Note', 'Catatan kecil: "samakan nominal sebelum rapat".', null, 72, 30],
-      ['Map Arsip', 'Map arsip memuat laporan lama yang berbeda dari laporan final.', 'selisih_anggaran', 26, 62],
-      ['Flashdisk', 'Tidak ada file baru di flashdisk ini.', null, 66, 62]
-    ]
-  },
-  {
-    id: 3,
-    title: 'Ruang Server',
-    bg: 'bg-server',
-    requiredEvidence: 'log_server',
-    opponent: 'Lawan',
-    opponentLine: 'Tidak ada akses ilegal dalam sistem.',
-    success: 'Bukti cocok. Log server membuktikan akses malam hari.',
-    fail: 'Bukti lemah. Akses ilegal belum terbukti.',
-    dialogue: [
-      ['Raka', ['File ini tidak seharusnya ada di sini.']],
-      ['Bella', ['Raka, keluar sekarang.']],
-      ['Raka', ['Tunggu. Ada log akses malam hari.']],
-      ['Bella', ['Kalau mereka tahu kamu melihat ini, selesai.']]
-    ],
-    clues: [
-      ['Laptop', 'Terminal server mencatat login pukul 02.13.', 'log_server', 18, 30],
-      ['Dokumen', 'Print out backup terlihat baru dikeluarkan.', null, 48, 48],
-      ['Sticky Note', 'Catatan sandi sementara tertempel di rak server.', null, 70, 26],
-      ['Map Arsip', 'Map ini hanya berisi daftar perangkat.', null, 24, 62],
-      ['Flashdisk', 'Flashdisk menyimpan backup log akses malam hari.', 'log_server', 66, 64]
-    ]
-  },
-  {
-    id: 4,
-    title: 'Sidang Internal',
-    bg: 'bg-court',
-    requiredEvidence: 'false_note_sys',
-    opponent: 'Dr. Adrian',
-    opponentLine: 'Tanpa bukti lengkap, ini hanya tuduhan.',
-    success: 'Bukti cocok. FALSE_NOTE.sys membuka seluruh rangkaian manipulasi.',
-    fail: 'Bukti lemah. Sidang mulai meragukan Raka.',
-    dialogue: [
-      ['Dr. Adrian', ['Kamu hanya mahasiswa magang.', 'Kamu tidak paham cara institusi bekerja.']],
-      ['Raka', ['Justru karena saya mahasiswa, saya tahu siapa yang dirugikan.']],
-      ['Dr. Adrian', ['Tanpa bukti lengkap, ini hanya tuduhan.']]
-    ],
-    clues: [
-      ['Laptop', 'Layar sidang menerima file dari akun anonim.', null, 20, 32],
-      ['Dokumen', 'Lampiran audit final tidak punya jejak verifikasi independen.', null, 48, 48],
-      ['Sticky Note', 'Catatan: "jika terdesak, serang kredibilitas Raka".', null, 72, 30],
-      ['Map Arsip', 'Map sidang berisi daftar saksi yang dicoret.', null, 26, 62],
-      ['Flashdisk', 'Flashdisk memuat file FALSE_NOTE.sys.', 'false_note_sys', 66, 64]
-    ]
-  }
-];
-
-const prolog = [
-  ['Sistem', ['Hari pertama magang Raka dimulai seperti biasa.']],
-  ['Sistem', ['Ruang administrasi terlihat rapi, tapi ada sesuatu yang terasa janggal.']],
-  ['Raka', ['Kenapa folder audit ini dikunci?']],
-  ['Raka', ['Dan kenapa namaku ada di daftar penerima akses?']],
-  ['Sistem', ['Sebuah file muncul di layar.']],
-  ['Sistem', ['Namanya: FALSE_NOTE.sys']],
-  ['Raka', ['Kalau ini cuma kesalahan sistem... kenapa aku merasa sedang diawasi?']]
-];
-
-const preEndingDialogue = [
-  ['Sistem', ['Ruang sidang mendadak sunyi.']],
-  ['Sistem', ['Semua layar menampilkan data yang sama.']],
-  ['Raka', ['Ini bukan soal menang debat.', 'Ini soal berapa lama kita membiarkan kebohongan terlihat normal.']],
-  ['Dr. Adrian', ['Kamu tidak tahu dampaknya.']],
-  ['Raka', ['Saya tahu.', 'Yang saya tidak tahu adalah kenapa semua orang memilih diam.']]
-];
-
-const endingText = {
-  true: [
-    'Raka menyerahkan seluruh bukti.',
-    'Sidang internal berubah menjadi investigasi resmi.',
-    'Beberapa nama diperiksa.',
-    'Kampus tidak langsung bersih.',
-    'Tapi hari itu, satu kebohongan berhenti terlihat normal.'
-  ],
-  neutral: [
-    'Raka berhasil bicara.',
-    'Tapi bukti yang ia bawa belum cukup kuat.',
-    'Beberapa orang mulai percaya.',
-    'Namun sistem belum sepenuhnya berubah.',
-    'Perjuangan belum selesai.'
-  ],
-  bad: [
-    'Raka terlalu lama ragu.',
-    'Bukti hilang sebelum sempat diserahkan.',
-    'Nama Raka berubah menjadi bahan rumor.',
-    'Dan kampus kembali berjalan seperti biasa.',
-    'Seolah tidak pernah terjadi apa-apa.'
-  ]
 };
 
 const el = {
@@ -220,56 +401,66 @@ const el = {
   speaker: document.getElementById('speaker-name'),
   dialogueText: document.getElementById('dialogue-text'),
   dialogueNext: document.getElementById('dialogue-next'),
-  settingPanel: document.getElementById('setting-panel'),
+  settingPanel: document.getElementById('settings-panel'),
   volumeToggle: document.getElementById('volume-toggle'),
   textSpeed: document.getElementById('text-speed'),
   settingClose: document.getElementById('setting-close'),
   eitssssLayer: document.getElementById('eitssss-layer'),
+  pauseButton: document.getElementById('pause-button'),
+  pausePanel: document.getElementById('pause-panel'),
+  pauseResume: document.getElementById('pause-resume'),
+  pauseExit: document.getElementById('pause-exit'),
   toast: document.getElementById('toast')
 };
 
-// ===============================
-// FUNGSI: init()
-// DESKRIPSI: Memasang event awal game.
-// ===============================
 function init() {
-  document.querySelector('[data-action="start"]').addEventListener('click', startGame);
-  document.querySelector('[data-action="load"]').addEventListener('click', loadGame);
-  document.querySelector('[data-action="setting"]').addEventListener('click', openSetting);
-  document.querySelector('[data-action="exit"]').addEventListener('click', () => showToast('Game ditutup.'));
+  const btnStart = document.getElementById('btn-start');
+  const btnLoad = document.getElementById('btn-load');
+  const btnExit = document.getElementById('btn-exit');
 
-  el.volumeToggle.addEventListener('click', () => {
+  if (btnStart) btnStart.addEventListener('click', startGame);
+  if (btnLoad) btnLoad.addEventListener('click', loadGame);
+  if (btnExit) btnExit.addEventListener('click', () => {
+    if (confirm('Keluar dari permainan?')) {
+      showToast('Game ditutup.');
+      window.close();
+    }
+  });
+
+  const legacySetting = document.querySelector('[data-action="setting"]');
+  if (legacySetting) legacySetting.addEventListener('click', openSetting);
+
+  if (el.volumeToggle) el.volumeToggle.addEventListener('click', () => {
     volumeOn = !volumeOn;
     el.volumeToggle.textContent = volumeOn ? 'ON' : 'OFF';
   });
-  el.textSpeed.addEventListener('change', (event) => {
+  if (el.textSpeed) el.textSpeed.addEventListener('change', (event) => {
     textSpeed = event.target.value;
   });
-  el.settingClose.addEventListener('click', closeSetting);
+  if (el.settingClose) el.settingClose.addEventListener('click', closeSetting);
+  if (el.pauseButton) el.pauseButton.addEventListener('click', openPauseMenu);
+  if (el.pauseResume) el.pauseResume.addEventListener('click', resumeGame);
+  if (el.pauseExit) el.pauseExit.addEventListener('click', () => returnToMainMenu('Game ditutup.'));
 
   updateHud();
 }
 
-// ===============================
-// FUNGSI: startGame()
-// DESKRIPSI: Memulai game baru dari prolog.
-// ===============================
 function startGame() {
+  flowToken += 1;
+  resetPauseState();
   integrity = 100;
   suspicion = 0;
   evidence = [];
-  unlockedCase = 1;
-  currentCase = 1;
+  currentPhase = 1;
+  investigationStep = 0;
+  twistUnlocked = false;
+  reportedSuspects = [];
   saveGame();
   hideMainMenu();
   setBackground('bg-office');
-  playDialogue(prolog, showCaseSelect);
+  playAutoPrologue(prologueLines, prologueBackgrounds, () => startPhase(1));
 }
 
-// ===============================
-// FUNGSI: loadGame()
-// DESKRIPSI: Mengambil progress dari localStorage.
-// ===============================
 function loadGame() {
   const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) {
@@ -279,29 +470,31 @@ function loadGame() {
 
   try {
     const data = JSON.parse(raw);
+    flowToken += 1;
+    resetPauseState();
     integrity = data.integrity ?? 100;
     suspicion = data.suspicion ?? 0;
     evidence = Array.isArray(data.evidence) ? data.evidence : [];
-    unlockedCase = data.unlockedCase ?? 1;
-    currentCase = data.currentCase ?? 1;
+    currentPhase = data.currentPhase ?? 1;
+    investigationStep = data.investigationStep ?? 0;
+    twistUnlocked = Boolean(data.twistUnlocked);
+    reportedSuspects = Array.isArray(data.reportedSuspects) ? data.reportedSuspects : [];
     hideMainMenu();
-    showCaseSelect();
+    showPhaseHub();
   } catch (error) {
     showToast('Data save rusak.');
   }
 }
 
-// ===============================
-// FUNGSI: saveGame()
-// DESKRIPSI: Menyimpan variabel utama game.
-// ===============================
 function saveGame() {
   localStorage.setItem(SAVE_KEY, JSON.stringify({
     integrity,
     suspicion,
     evidence,
-    unlockedCase,
-    currentCase
+    currentPhase,
+    investigationStep,
+    twistUnlocked,
+    reportedSuspects
   }));
 }
 
@@ -310,7 +503,48 @@ function hideMainMenu() {
   el.content.classList.remove('hidden');
   el.status.classList.remove('hidden');
   el.inventory.classList.remove('hidden');
+  if (el.pauseButton) el.pauseButton.classList.remove('hidden');
   updateHud();
+}
+
+function resetPauseState() {
+  isPaused = false;
+  pauseCallbacks = [];
+  el.pausePanel.classList.add('hidden');
+  if (el.pauseButton) el.pauseButton.classList.add('hidden');
+}
+
+function openPauseMenu() {
+  if (!el.mainMenu.classList.contains('hidden')) return;
+  isPaused = true;
+  el.pausePanel.classList.remove('hidden');
+  if (el.pauseButton) el.pauseButton.classList.add('hidden');
+}
+
+function resumeGame() {
+  isPaused = false;
+  el.pausePanel.classList.add('hidden');
+  if (el.mainMenu.classList.contains('hidden') && el.pauseButton) {
+    el.pauseButton.classList.remove('hidden');
+  }
+
+  const callbacks = pauseCallbacks.splice(0);
+  callbacks.forEach((callback) => callback());
+}
+
+function returnToMainMenu(message) {
+  flowToken += 1;
+  saveGame();
+  resetPauseState();
+  setContent('');
+  hideCharacterStage();
+  el.dialogueBox.classList.add('hidden');
+  el.content.classList.add('hidden');
+  el.status.classList.add('hidden');
+  el.inventory.classList.add('hidden');
+  el.mainMenu.classList.remove('hidden');
+  setBackground('bg-office');
+  if (message) showToast(message);
 }
 
 function openSetting() {
@@ -327,6 +561,76 @@ function setBackground(className) {
 
 function setContent(html) {
   el.content.innerHTML = html;
+}
+
+function showToast(message) {
+  el.toast.textContent = message;
+  el.toast.classList.remove('hidden');
+  window.clearTimeout(showToast.timer);
+  showToast.timer = window.setTimeout(() => el.toast.classList.add('hidden'), 1800);
+}
+
+function updateHud() {
+  const safeIntegrity = Math.max(0, Math.min(100, integrity));
+  const safeSuspicion = Math.max(0, Math.min(100, suspicion));
+  el.integrityBar.style.width = `${safeIntegrity}%`;
+  el.suspicionBar.style.width = `${safeSuspicion}%`;
+  el.integrityText.textContent = safeIntegrity;
+  el.suspicionText.textContent = safeSuspicion;
+  renderInventory();
+}
+
+function renderInventory() {
+  const latestEvidence = evidence.slice(-3);
+  el.inventorySlots.innerHTML = '';
+  for (let index = 0; index < 3; index += 1) {
+    const id = latestEvidence[index];
+    const data = evidenceDatabase[id];
+    const item = document.createElement('div');
+    item.className = `slot ${data ? '' : 'empty'}`;
+    item.textContent = data ? data.name : 'Kosong';
+    if (data) item.title = `${data.desc}\nHint: ${data.hint}`;
+    el.inventorySlots.appendChild(item);
+  }
+}
+
+function addEvidence(id) {
+  if (!id || evidence.includes(id) || !evidenceDatabase[id]) return false;
+  evidence.push(id);
+  updateHud();
+  saveGame();
+  showToast(`Bukti didapat: ${evidenceDatabase[id].name}`);
+  return true;
+}
+
+function evidenceCount() {
+  return evidence.filter((id) => evidenceDatabase[id]).length;
+}
+
+function hasEvidence(id) {
+  return evidence.includes(id);
+}
+
+function applyWrongAnswer() {
+  integrity = Math.max(0, integrity - 10);
+  suspicion = Math.min(100, suspicion + 12);
+  updateHud();
+  saveGame();
+}
+
+function applyCorrectAnswer() {
+  suspicion = Math.min(100, suspicion + 3);
+  updateHud();
+  saveGame();
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 function prepareCharacterStage(dialogueQueue) {
@@ -371,66 +675,6 @@ function hideCharacterStage() {
   el.characterStage.innerHTML = '';
 }
 
-function showToast(message) {
-  el.toast.textContent = message;
-  el.toast.classList.remove('hidden');
-  window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => el.toast.classList.add('hidden'), 1800);
-}
-
-function updateHud() {
-  const safeIntegrity = Math.max(0, Math.min(100, integrity));
-  const safeSuspicion = Math.max(0, Math.min(100, suspicion));
-  el.integrityBar.style.width = `${safeIntegrity}%`;
-  el.suspicionBar.style.width = `${safeSuspicion}%`;
-  el.integrityText.textContent = safeIntegrity;
-  el.suspicionText.textContent = safeSuspicion;
-  renderInventory();
-}
-
-function renderInventory() {
-  const latestEvidence = evidence.slice(-3);
-  el.inventorySlots.innerHTML = '';
-  for (let index = 0; index < 3; index += 1) {
-    const id = latestEvidence[index];
-    const item = document.createElement('div');
-    item.className = `slot ${id ? '' : 'empty'}`;
-    item.textContent = id ? evidenceDatabase[id].name : 'Kosong';
-    if (id) item.title = `${evidenceDatabase[id].desc}\nHint: ${evidenceDatabase[id].hint}`;
-    el.inventorySlots.appendChild(item);
-  }
-}
-
-function addEvidence(id) {
-  if (!id || evidence.includes(id)) return;
-  evidence.push(id);
-  updateHud();
-  saveGame();
-}
-
-function applyWrongAnswer() {
-  integrity = Math.max(0, integrity - 10);
-  suspicion = Math.min(100, suspicion + 15);
-  updateHud();
-  saveGame();
-  if (suspicion >= 100) showEnding('bad');
-}
-
-function applyCorrectAnswer() {
-  suspicion = Math.min(100, suspicion + 5);
-  updateHud();
-  saveGame();
-  if (suspicion >= 100) showEnding('bad');
-}
-
-// ===============================
-// FUNGSI: showDialogue()
-// DESKRIPSI: Dialog reusable untuk prolog, case, dan ending.
-// PARAMETER:
-// speaker: nama pembicara
-// textArray: daftar teks
-// onComplete: callback saat selesai
-// ===============================
 function showDialogue(speaker, textArray, onComplete) {
   let lineIndex = 0;
   let charIndex = 0;
@@ -457,6 +701,7 @@ function showDialogue(speaker, textArray, onComplete) {
     el.dialogueText.classList.add('typing');
     window.clearInterval(typeTimer);
     typeTimer = window.setInterval(() => {
+      if (isPaused) return;
       charIndex += 1;
       el.dialogueText.textContent = currentLine.slice(0, charIndex);
       if (charIndex >= currentLine.length) finishLine();
@@ -499,202 +744,531 @@ function playDialogue(queue, onComplete) {
   playNext();
 }
 
-function showCaseSelect() {
-  setBackground('bg-corridor');
+function playAutoPrologue(lines, backgrounds, onComplete) {
+  let index = 0;
+  let charIndex = 0;
+  let typing = false;
+  let timer = null;
+  const token = flowToken;
+
+  hideCharacterStage();
+  el.dialogueBox.classList.add('hidden');
+  el.status.classList.add('hidden');
+  el.inventory.classList.add('hidden');
+
+  setContent(`
+    <section class="prologue-cinematic cursor-pointer" id="prologue-container">
+      <div class="shade"></div>
+      <p id="auto-prologue-text" class="prologue-line show"></p>
+      <div class="absolute bottom-12 text-stone-500 animate-pulse text-[10px] tracking-[0.3em] uppercase z-10">
+        Klik untuk Lanjut
+      </div>
+    </section>
+  `);
+
+  const container = document.getElementById('prologue-container');
+  const textElement = document.getElementById('auto-prologue-text');
+
+  const finishLine = () => {
+    window.clearInterval(timer);
+    textElement.textContent = lines[index];
+    textElement.classList.remove('typing');
+    typing = false;
+  };
+
+  const typeLine = () => {
+    if (token !== flowToken) return;
+    const bgIndex = Math.min(index, backgrounds.length - 1);
+    setBackground(backgrounds[bgIndex]);
+    charIndex = 0;
+    typing = true;
+    textElement.textContent = '';
+    textElement.classList.add('typing');
+    window.clearInterval(timer);
+    timer = window.setInterval(() => {
+      if (isPaused) return;
+      charIndex += 1;
+      textElement.textContent = lines[index].slice(0, charIndex);
+      if (charIndex >= lines[index].length) finishLine();
+    }, speedMap[textSpeed] || 25);
+  };
+
+  const next = () => {
+    if (token !== flowToken) return;
+    if (typing) {
+      finishLine();
+      return;
+    }
+
+    index += 1;
+    if (index >= lines.length) {
+      window.clearInterval(timer);
+      setContent('');
+      el.status.classList.remove('hidden');
+      el.inventory.classList.remove('hidden');
+      onComplete?.();
+      return;
+    }
+    typeLine();
+  };
+
+  container.addEventListener('click', next);
+  typeLine();
+}
+
+function startPhase(phase) {
+  currentPhase = phase;
+  saveGame();
+  const intro = phaseIntro[phase];
+  if (intro) {
+    const bg = phase === 4 ? 'bg-court' : phase === 3 ? 'bg-library' : 'bg-office';
+    setBackground(bg);
+    playDialogue(intro, showPhaseHub);
+    return;
+  }
+  showPhaseHub();
+}
+
+function showPhaseHub() {
   updateHud();
-  const cards = cases.map((caseData) => {
-    const locked = caseData.id > unlockedCase;
+  hideCharacterStage();
+
+  if (currentPhase === 1) {
+    showOrientation();
+    return;
+  }
+  if (currentPhase === 2) {
+    showInvestigationHub();
+    return;
+  }
+  if (currentPhase === 3) {
+    showAnalysis();
+    return;
+  }
+  showTrial();
+}
+
+function showOrientation() {
+  setBackground('bg-office');
+  const suspectCards = suspects.map((suspect) => `
+    <article style="padding:16px;border:1px solid rgba(250,204,21,.25);background:rgba(15,23,42,.72);">
+      <h3 style="margin:0 0 6px;color:#facc15;">${escapeHtml(suspect.name)}</h3>
+      <p style="margin:0 0 8px;"><b>${escapeHtml(suspect.title)}</b></p>
+      <p style="margin:0 0 12px;">Kesan awal: ${escapeHtml(suspect.appearance)}</p>
+      <p style="margin:0;color:#cbd5e1;">Tuduhan: ${escapeHtml(suspect.crimes.join(', '))}</p>
+    </article>
+  `).join('');
+
+  setContent(`
+    <section class="center-panel" style="max-height:72vh;overflow:auto;">
+      <h2>FASE 1: ORIENTASI</h2>
+      <p>Adrian menyerahkan daftar terdakwa. Bella mengingatkan Raka agar tidak menilai dari sikap luar.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0;">
+        ${suspectCards}
+      </div>
+      <div class="button-row">
+        <button class="gold-button" id="start-investigation">Mulai Investigasi</button>
+      </div>
+    </section>
+  `);
+
+  document.getElementById('start-investigation').addEventListener('click', () => {
+    currentPhase = 2;
+    investigationStep = 0;
+    saveGame();
+    showInvestigationHub();
+  });
+}
+
+function showInvestigationHub() {
+  setBackground('bg-corridor');
+  const steps = [
+    'Verifikasi Dokumen',
+    'Verifikasi Stempel',
+    'Analisis Percakapan'
+  ];
+  const cards = steps.map((title, index) => {
+    const status = index < investigationStep ? 'Selesai' : index === investigationStep ? 'Aktif' : 'Terkunci';
+    const locked = index > investigationStep;
     return `
-      <button class="case-card ${locked ? 'locked' : ''}" data-case="${caseData.id}" ${locked ? 'disabled' : ''}>
-        <b>Case ${caseData.id}</b>
-        <span>${caseData.title}</span>
+      <button class="case-card ${locked ? 'locked' : ''}" data-step="${index}" ${locked ? 'disabled' : ''}>
+        <b>${escapeHtml(title)}</b>
+        <span>${status}</span>
       </button>
     `;
   }).join('');
 
   setContent(`
     <section class="center-panel">
-      <h2>PILIH CASE</h2>
-      <p>Case yang belum terbuka akan terkunci sampai case sebelumnya selesai.</p>
+      <h2>FASE 2: INVESTIGASI</h2>
+      <p>Jalankan mini-game satu per satu. Jeki memang defensif, tetapi bukti harus bicara lebih keras.</p>
       <div class="case-grid">${cards}</div>
     </section>
   `);
 
-  document.querySelectorAll('[data-case]').forEach((button) => {
-    button.addEventListener('click', () => startCase(Number(button.dataset.case)));
+  document.querySelectorAll('[data-step]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const step = Number(button.dataset.step);
+      if (step === 0) runDocumentGame(0);
+      if (step === 1) runStampGame(0);
+      if (step === 2) runChatGame(0);
+    });
   });
 }
 
-function startCase(caseId) {
-  const caseData = cases.find((item) => item.id === caseId);
-  if (!caseData || caseId > unlockedCase) return;
+function runDocumentGame(index) {
+  setBackground('bg-library');
+  if (index >= documents.length) {
+    investigationStep = Math.max(investigationStep, 1);
+    saveGame();
+    showDialogue('Bella', ['Dokumen selesai diperiksa.', 'Jangan buru-buru menuduh Jeki.'], showInvestigationHub);
+    return;
+  }
 
-  currentCase = caseId;
-  saveGame();
-  setBackground(caseData.bg);
-  setContent('');
-  playDialogue(caseData.dialogue, () => showInvestigation(caseData));
+  const doc = documents[index];
+  setContent(`
+    <section class="center-panel" style="max-height:72vh;overflow:auto;">
+      <h2>VERIFIKASI DOKUMEN</h2>
+      <p>Dokumen ${index + 1} dari ${documents.length}</p>
+      <article style="margin:18px 0;padding:18px;background:#fff7ed;color:#111827;border:2px solid #b45309;">
+        <h3 style="margin:0 0 10px;">${escapeHtml(doc.title)}</h3>
+        <p style="line-height:1.6;">${escapeHtml(doc.content)}</p>
+        <small>Hint: ${escapeHtml(doc.hint)}</small>
+      </article>
+      <p>Apakah dokumen ini dimanipulasi?</p>
+      <div class="button-row">
+        <button class="fake-button" data-manipulated="true">MANIPULASI</button>
+        <button class="valid-button" data-manipulated="false">VALID</button>
+      </div>
+    </section>
+  `);
+
+  document.querySelectorAll('[data-manipulated]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const choseManipulated = button.dataset.manipulated === 'true';
+      const correct = choseManipulated === doc.isManipulated;
+      if (correct) {
+        applyCorrectAnswer();
+        addEvidence(doc.evidenceId);
+        const line = doc.evidenceId
+          ? 'Detail janggal berhasil dibuktikan.'
+          : 'Dokumen Jeki justru bersih.';
+        showDialogue('Sistem', [line], () => runDocumentGame(index + 1));
+        return;
+      }
+      applyWrongAnswer();
+      showDialogue('Sistem', ['Analisis dokumen keliru.', 'Periksa detail kecilnya lagi.'], () => runDocumentGame(index + 1));
+    });
+  });
 }
 
-function showInvestigation(caseData) {
-  setBackground(caseData.bg);
-  const hotspots = caseData.clues.map(([label, desc, evidenceId, x, y], index) => `
-    <button class="hotspot" style="left:${x}%; top:${y}%;" data-clue="${index}">
-      ${label}
-    </button>
+function runStampGame(index) {
+  setBackground('bg-office');
+  if (index >= stamps.length) {
+    investigationStep = Math.max(investigationStep, 2);
+    saveGame();
+    showDialogue('Bella', ['Stempel selesai diperiksa.', 'Satu cap terasa terlalu rapi.'], showInvestigationHub);
+    return;
+  }
+
+  const stamp = stamps[index];
+  setContent(`
+    <section class="center-panel">
+      <h2>VERIFIKASI STEMPEL</h2>
+      <p>Stempel ${index + 1} dari ${stamps.length}</p>
+      <article style="margin:18px 0;padding:22px;border:2px dashed rgba(250,204,21,.55);background:rgba(15,23,42,.8);">
+        <h3 style="margin:0 0 10px;color:#facc15;">${escapeHtml(stamp.owner)}</h3>
+        <p>${escapeHtml(stamp.visualHint)}</p>
+      </article>
+      <p>Apakah stempel ini asli?</p>
+      <div class="button-row">
+        <button class="valid-button" data-authentic="true">ASLI</button>
+        <button class="fake-button" data-authentic="false">PALSU</button>
+      </div>
+    </section>
+  `);
+
+  document.querySelectorAll('[data-authentic]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const choseAuthentic = button.dataset.authentic === 'true';
+      const correct = choseAuthentic === stamp.isAuthentic;
+      if (correct) {
+        applyCorrectAnswer();
+        addEvidence(stamp.evidenceId);
+        checkTwist(() => runStampGame(index + 1));
+        return;
+      }
+      applyWrongAnswer();
+      showDialogue('Sistem', ['Pembacaan stempel keliru.'], () => runStampGame(index + 1));
+    });
+  });
+}
+
+function runChatGame(questionIndex) {
+  setBackground('bg-server');
+  if (questionIndex >= chatGame.questions.length) {
+    investigationStep = Math.max(investigationStep, 3);
+    currentPhase = 3;
+    saveGame();
+    checkTwist(() => startPhase(3));
+    return;
+  }
+
+  const question = chatGame.questions[questionIndex];
+  const logHtml = chatGame.chatLog.map((entry) => `
+    <div style="padding:10px 12px;margin:0 0 8px;background:rgba(15,23,42,.78);border-left:3px solid #facc15;">
+      <b>${escapeHtml(entry.sender)}</b>
+      <small style="float:right;color:#94a3b8;">${escapeHtml(entry.timestamp)}</small>
+      <p style="margin:8px 0 0;">${escapeHtml(entry.message)}</p>
+    </div>
+  `).join('');
+
+  const options = question.options.map((option) => `
+    <button class="evidence-button" data-answer="${escapeHtml(option)}">${escapeHtml(option)}</button>
   `).join('');
 
   setContent(`
-    <section class="center-panel">
-      <h2>INVESTIGATION MODE</h2>
-      <p>Klik objek di ruangan. Beberapa clue akan masuk ke inventory.</p>
-      <div class="investigation-map">${hotspots}</div>
+    <section class="center-panel" style="max-height:72vh;overflow:auto;">
+      <h2>ANALISIS PERCAKAPAN</h2>
+      <div style="margin:16px 0;">${logHtml}</div>
+      <p><b>${escapeHtml(question.question)}</b></p>
+      <div style="display:grid;gap:12px;">${options}</div>
+    </section>
+  `);
+
+  document.querySelectorAll('[data-answer]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const selected = button.dataset.answer;
+      if (selected === question.correctAnswer) {
+        applyCorrectAnswer();
+        addEvidence(question.evidenceId);
+        showDialogue('Sistem', [question.feedbackRight], () => {
+          checkTwist(() => runChatGame(questionIndex + 1));
+        });
+        return;
+      }
+      applyWrongAnswer();
+      showDialogue('Sistem', [question.feedbackWrong], () => runChatGame(questionIndex + 1));
+    });
+  });
+}
+
+function checkTwist(onComplete) {
+  const shouldUnlock = twistSystem.twistTriggers.every((id) => hasEvidence(id));
+  if (!twistUnlocked && shouldUnlock) {
+    twistUnlocked = true;
+    saveGame();
+    playDialogue(twistSystem.twistDialogue, onComplete);
+    return;
+  }
+  onComplete?.();
+}
+
+function showAnalysis() {
+  setBackground('bg-library');
+  const evidenceCards = Object.values(evidenceDatabase).map((item) => {
+    const owned = hasEvidence(item.id);
+    return `
+      <article style="padding:14px;border:1px solid ${owned ? 'rgba(34,197,94,.6)' : 'rgba(248,113,113,.45)'};background:rgba(15,23,42,.72);">
+        <h3 style="margin:0 0 8px;color:${owned ? '#bbf7d0' : '#fecaca'};">${owned ? 'OK' : 'NO'} ${escapeHtml(item.name)}</h3>
+        <p style="margin:0 0 8px;">${escapeHtml(item.desc)}</p>
+        <small>${escapeHtml(item.hint)}</small>
+      </article>
+    `;
+  }).join('');
+
+  const suspectRows = suspects.map((suspect) => {
+    const matched = suspect.requiredEvidence.filter((id) => hasEvidence(id)).length;
+    const total = suspect.requiredEvidence.length;
+    const roleText = suspect.id === 'jeki' && twistUnlocked
+      ? 'Terindikasi korban jebakan'
+      : `${matched}/${total} bukti cocok`;
+    return `
+      <article style="padding:16px;border:1px solid rgba(250,204,21,.25);background:rgba(3,7,18,.58);">
+        <h3 style="margin:0 0 8px;color:#facc15;">${escapeHtml(suspect.name)}</h3>
+        <p style="margin:0 0 8px;">${escapeHtml(roleText)}</p>
+        <p style="margin:0;color:#cbd5e1;">${escapeHtml(suspect.crimes.join(', '))}</p>
+      </article>
+    `;
+  }).join('');
+
+  setContent(`
+    <section class="center-panel" style="max-height:72vh;overflow:auto;">
+      <h2>FASE 3: ANALISIS</h2>
+      <p>Bukti terkumpul: ${evidenceCount()}/6. Twist Jeki: ${twistUnlocked ? 'Terbuka' : 'Belum terbuka'}.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0;">
+        ${suspectRows}
+      </div>
+      <h3 style="color:#facc15;">Checklist Bukti</h3>
+      <div style="display:grid;gap:10px;margin:14px 0;">${evidenceCards}</div>
       <div class="button-row">
-        <button class="gold-button" id="audit-button">Analisis Dokumen Audit</button>
+        <button class="gold-button" id="go-trial">Lanjut Sidang</button>
       </div>
     </section>
   `);
 
-  document.querySelectorAll('[data-clue]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const [label, desc, evidenceId] = caseData.clues[Number(button.dataset.clue)];
-      button.classList.add('done');
-      if (evidenceId) addEvidence(evidenceId);
-      showDialogue('Sistem', [`${label}: ${desc}`], () => {});
+  document.getElementById('go-trial').addEventListener('click', () => {
+    currentPhase = 4;
+    saveGame();
+    startPhase(4);
+  });
+}
+
+function showTrial() {
+  setBackground('bg-court');
+  const suspectButtons = suspects.map((suspect) => {
+    const checked = reportedSuspects.includes(suspect.id) ? 'checked' : '';
+    return `
+      <label style="display:block;margin:0 0 12px;padding:14px;border:1px solid rgba(250,204,21,.28);background:rgba(15,23,42,.72);">
+        <input type="checkbox" data-report="${suspect.id}" ${checked} style="margin-right:10px;">
+        <b>${escapeHtml(suspect.name)}</b> - ${escapeHtml(suspect.title)}
+        <span style="display:block;margin-top:6px;color:#cbd5e1;">${escapeHtml(suspect.appearance)}</span>
+      </label>
+    `;
+  }).join('');
+
+  setContent(`
+    <section class="center-panel" style="max-height:72vh;overflow:auto;">
+      <h2>FASE 4: SIDANG</h2>
+      <p>Pilih siapa yang dilaporkan. Pilihan ini menentukan ending.</p>
+      <p>Bukti: ${evidenceCount()}/6. Twist Jeki: ${twistUnlocked ? 'Terbuka' : 'Belum terbuka'}.</p>
+      <div style="margin:18px 0;">${suspectButtons}</div>
+      <div class="button-row">
+        <button class="danger-button" id="submit-report">Laporkan Pilihan</button>
+      </div>
+    </section>
+  `);
+
+  document.querySelectorAll('[data-report]').forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const id = checkbox.dataset.report;
+      if (checkbox.checked && !reportedSuspects.includes(id)) reportedSuspects.push(id);
+      if (!checkbox.checked) reportedSuspects = reportedSuspects.filter((item) => item !== id);
+      saveGame();
     });
   });
 
-  document.getElementById('audit-button').addEventListener('click', () => showValidationGate(caseData));
-}
-
-function showValidationGate(caseData) {
-  setContent(`
-    <section class="center-panel">
-      <h2>DOKUMEN AUDIT</h2>
-      <p>Status dokumen terlihat valid, tetapi beberapa clue menunjukkan inkonsistensi.</p>
-      <p>Tekan EITSSSS untuk menantang dokumen sebelum memilih validasi.</p>
-      <div class="button-row">
-        <button class="danger-button" id="eitssss-validation">EITSSSS!</button>
-      </div>
-    </section>
-  `);
-
-  document.getElementById('eitssss-validation').addEventListener('click', () => {
-    playEitssssEffect(() => showValidationChoices(caseData));
+  document.getElementById('submit-report').addEventListener('click', () => {
+    if (reportedSuspects.length === 0) {
+      showToast('Pilih minimal satu terdakwa.');
+      return;
+    }
+    playFinalSuspectDialogues(() => showEnding());
   });
 }
 
-function showValidationChoices(caseData) {
-  setContent(`
-    <section class="center-panel">
-      <h2>VALID / PALSU</h2>
-      <p>Apakah dokumen audit ini valid?</p>
-      <div class="button-row">
-        <button class="valid-button" id="choose-valid">VALID</button>
-        <button class="fake-button" id="choose-fake">PALSU</button>
-      </div>
-    </section>
-  `);
+function playFinalSuspectDialogues(onComplete) {
+  const queue = suspects
+    .filter((suspect) => reportedSuspects.includes(suspect.id))
+    .map((suspect) => [suspect.name.split(' ')[0], suspect.dialogue.final]);
 
-  document.getElementById('choose-valid').addEventListener('click', () => resolveValidation(caseData, true));
-  document.getElementById('choose-fake').addEventListener('click', () => resolveValidation(caseData, false));
-}
-
-function resolveValidation(caseData, choseValid) {
-  const hasClue = evidence.includes(caseData.requiredEvidence);
-  const correct = !choseValid && hasClue;
-
-  if (correct) {
-    applyCorrectAnswer();
-    showDialogue('Sistem', ['Inkonsistensi ditemukan. Bukti berhasil diamankan.'], () => showDebate(caseData));
+  if (queue.length === 0) {
+    onComplete?.();
     return;
   }
-
-  applyWrongAnswer();
-  if (suspicion >= 100) return;
-  showDialogue('Sistem', ['Analisis belum kuat. Integrity berkurang dan suspicion naik.'], () => showInvestigation(caseData));
+  playDialogue(queue, onComplete);
 }
 
-function showDebate(caseData) {
-  setBackground(caseData.bg);
+function reportedOnly(ids) {
+  return reportedSuspects.length === ids.length
+    && ids.every((id) => reportedSuspects.includes(id));
+}
+
+function resolveEnding() {
+  if (reportedSuspects.includes('jeki')) {
+    return {
+      id: 'bad_ending_salah_sasaran',
+      title: 'BAD ENDING A: SALAH SASARAN',
+      color: '#ef4444',
+      lines: [
+        'Jeki dihukum.',
+        'Hendra dan Sinta bebas.',
+        'Adrian kecewa pada Raka.',
+        'Bella berkata:',
+        'Ada yang salah, Raka.',
+        'Kita salah orang.'
+      ]
+    };
+  }
+
+  if (reportedOnly(['hendra', 'sinta']) && evidenceCount() < 3) {
+    return {
+      id: 'bad_ending_bukti_lemah',
+      title: 'BAD ENDING B: TIDAK CUKUP BUKTI',
+      color: '#ef4444',
+      lines: [
+        'Kasus ditolak karena bukti lemah.',
+        'Semua terdakwa bebas.',
+        'Adrian berkata:',
+        'Investigasi tanpa bukti bukan investigasi.',
+        'Itu tuduhan.'
+      ]
+    };
+  }
+
+  if (reportedOnly(['hendra', 'sinta']) && twistUnlocked && evidenceCount() >= 5) {
+    return {
+      id: 'true_ending',
+      title: 'TRUE ENDING',
+      color: '#22c55e',
+      lines: [
+        'Hendra dan Sinta ditangkap.',
+        'Nama Jeki dipulihkan.',
+        'Adrian memuji kerja Raka.',
+        'Bella berkata:',
+        'Kamu sudah jadi detektif sungguhan.'
+      ]
+    };
+  }
+
+  if (reportedOnly(['hendra', 'sinta']) && (!twistUnlocked || evidenceCount() >= 3)) {
+    return {
+      id: 'neutral_ending',
+      title: 'NEUTRAL ENDING',
+      color: '#facc15',
+      lines: [
+        'Hendra dan Sinta ditangkap.',
+        'Kasus Jeki masih menggantung.',
+        'Bella berkata:',
+        'Ada yang terlewat.'
+      ]
+    };
+  }
+
+  return {
+    id: 'bad_ending_bukti_lemah',
+    title: 'BAD ENDING B: TIDAK CUKUP BUKTI',
+    color: '#ef4444',
+    lines: [
+      'Laporan Raka tidak utuh.',
+      'Sidang menolak kesimpulannya.',
+      'Semua terdakwa bebas.',
+      'Bukti tidak cukup kuat.'
+    ]
+  };
+}
+
+function showEnding() {
+  const ending = resolveEnding();
+  setBackground(ending.id.includes('bad') ? 'bg-corridor' : 'bg-court');
+  hideCharacterStage();
   setContent(`
-    <section class="center-panel">
-      <h2>DEBAT</h2>
-      <p><b>${caseData.opponent}:</b> "${caseData.opponentLine}"</p>
-      <p>Tekan EITSSSS untuk membuka pilihan bukti.</p>
+    <section class="center-panel" style="max-height:72vh;overflow:auto;">
+      <h2 style="color:${ending.color};">${escapeHtml(ending.title)}</h2>
+      ${ending.lines.map((line) => `<p>${escapeHtml(line)}</p>`).join('')}
+      <p style="margin-top:18px;color:#cbd5e1;">Bukti terkumpul: ${evidenceCount()}/6</p>
       <div class="button-row">
-        <button class="danger-button" id="eitssss-debate">EITSSSS!</button>
+        <button class="gold-button" id="ending-menu">Kembali ke Main Menu</button>
       </div>
     </section>
   `);
 
-  document.getElementById('eitssss-debate').addEventListener('click', () => {
-    playEitssssEffect(() => showEvidenceChoices(caseData));
+  saveGame();
+  document.getElementById('ending-menu').addEventListener('click', () => {
+    returnToMainMenu();
   });
 }
 
-function showEvidenceChoices(caseData) {
-  const buttons = evidence.length === 0
-    ? '<p>Belum ada bukti di inventory.</p>'
-    : evidence.map((id) => `
-      <button class="evidence-button" data-evidence="${id}">
-        <b>${evidenceDatabase[id].name}</b><br>
-        <small>${evidenceDatabase[id].hint}</small>
-      </button>
-    `).join('');
-
-  setContent(`
-    <section class="center-panel">
-      <h2>PILIH BUKTI</h2>
-      <p>Pilih bukti untuk membantah klaim lawan.</p>
-      ${buttons}
-    </section>
-  `);
-
-  document.querySelectorAll('[data-evidence]').forEach((button) => {
-    button.addEventListener('click', () => resolveDebate(caseData, button.dataset.evidence));
-  });
-}
-
-function resolveDebate(caseData, selectedEvidence) {
-  if (selectedEvidence === caseData.requiredEvidence) {
-    applyCorrectAnswer();
-    unlockedCase = Math.max(unlockedCase, caseData.id + 1);
-    saveGame();
-    showDialogue('Sistem', [caseData.success], () => showCaseResult(caseData, true));
-    return;
-  }
-
-  applyWrongAnswer();
-  if (suspicion >= 100) return;
-  showDialogue('Sistem', [caseData.fail], () => showCaseResult(caseData, false));
-}
-
-function showCaseResult(caseData, success) {
-  if (success && caseData.id === 4) {
-    playDialogue(preEndingDialogue, () => showEnding());
-    return;
-  }
-
-  setContent(`
-    <section class="center-panel">
-      <h2>${success ? 'CASE SELESAI' : 'CASE GAGAL'}</h2>
-      <p>${success ? 'Case berikutnya terbuka dan progress tersimpan.' : 'Bukti belum cukup. Ulangi case ini dari pilihan case.'}</p>
-      <div class="button-row">
-        <button class="gold-button" id="back-case">Kembali ke Pilih Case</button>
-      </div>
-    </section>
-  `);
-
-  document.getElementById('back-case').addEventListener('click', showCaseSelect);
-}
-
-// ===============================
-// FUNGSI: playEitssssEffect()
-// DESKRIPSI:
-// Efek hanya dipanggil dari klik tombol EITSSSS.
-// Tidak dipanggil otomatis saat jawaban benar.
-// ===============================
 function playEitssssEffect(onComplete) {
   el.eitssssLayer.classList.remove('hidden');
   el.screen.classList.add('shake');
@@ -707,36 +1281,6 @@ function playEitssssEffect(onComplete) {
     el.eitssssLayer.classList.add('hidden');
     onComplete?.();
   }, 920);
-}
-
-function showEnding(forcedType) {
-  let type = forcedType;
-  if (!type) {
-    if (integrity < 40 || suspicion >= 100) type = 'bad';
-    else if (integrity >= 70 && evidence.length >= 3) type = 'true';
-    else type = 'neutral';
-  }
-
-  setBackground(type === 'bad' ? 'bg-corridor' : 'bg-court');
-  const title = type === 'true' ? 'TRUE ENDING' : type === 'neutral' ? 'NEUTRAL ENDING' : 'BAD ENDING';
-  setContent(`
-    <section class="center-panel">
-      <h2>${title}</h2>
-      ${endingText[type].map((line) => `<p>${line}</p>`).join('')}
-      <div class="button-row">
-        <button class="gold-button" id="ending-menu">Kembali ke Main Menu</button>
-      </div>
-    </section>
-  `);
-
-  saveGame();
-  document.getElementById('ending-menu').addEventListener('click', () => {
-    el.content.classList.add('hidden');
-    el.status.classList.add('hidden');
-    el.inventory.classList.add('hidden');
-    el.mainMenu.classList.remove('hidden');
-    setBackground('bg-office');
-  });
 }
 
 init();

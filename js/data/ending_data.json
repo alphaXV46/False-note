@@ -1,0 +1,121 @@
+[
+  {
+    "id": "true_ending",
+    "title": "True Ending",
+    "priority": 1,
+    "conditions": {
+      "reportedSuspects": [
+        "hendra",
+        "sinta"
+      ],
+      "notReported": [
+        "jeki"
+      ],
+      "twistUnlocked": true,
+      "minEvidenceCount": 5
+    },
+    "text": [
+      "Hendra dan Sinta ditangkap.",
+      "Nama Jeki dipulihkan.",
+      "Adrian memuji kerja Raka."
+    ],
+    "dialogue": [
+      {
+        "speaker": "Adrian",
+        "text": [
+          "Kerjamu rapi, Raka."
+        ]
+      },
+      {
+        "speaker": "Bella",
+        "text": [
+          "Kamu sudah jadi detektif sungguhan."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "neutral_ending",
+    "title": "Neutral Ending",
+    "priority": 2,
+    "conditions": {
+      "reportedSuspects": [
+        "hendra",
+        "sinta"
+      ],
+      "notReported": [
+        "jeki"
+      ],
+      "anyOf": [
+        {
+          "twistUnlocked": false
+        },
+        {
+          "minEvidenceCount": 3,
+          "maxEvidenceCount": 4
+        }
+      ]
+    },
+    "text": [
+      "Hendra dan Sinta ditangkap.",
+      "Kasus Jeki masih menggantung."
+    ],
+    "dialogue": [
+      {
+        "speaker": "Bella",
+        "text": [
+          "Ada yang terlewat."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bad_ending_salah_sasaran",
+    "title": "Bad Ending A: Salah Sasaran",
+    "priority": 3,
+    "conditions": {
+      "reportedIncludes": [
+        "jeki"
+      ]
+    },
+    "text": [
+      "Jeki dihukum.",
+      "Hendra dan Sinta bebas.",
+      "Adrian kecewa pada Raka."
+    ],
+    "dialogue": [
+      {
+        "speaker": "Bella",
+        "text": [
+          "Ada yang salah, Raka.",
+          "Kita salah orang."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bad_ending_bukti_lemah",
+    "title": "Bad Ending B: Tidak Cukup Bukti",
+    "priority": 4,
+    "conditions": {
+      "reportedSuspects": [
+        "hendra",
+        "sinta"
+      ],
+      "maxEvidenceCount": 2
+    },
+    "text": [
+      "Kasus ditolak karena bukti lemah.",
+      "Semua terdakwa bebas."
+    ],
+    "dialogue": [
+      {
+        "speaker": "Adrian",
+        "text": [
+          "Investigasi tanpa bukti bukan investigasi.",
+          "Itu tuduhan."
+        ]
+      }
+    ]
+  }
+]

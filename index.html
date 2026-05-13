@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FALSE NOTE - The Silent Witness</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.cdnfonts.com/css/coolvetica" rel="stylesheet">
 </head>
 <body>
   <main id="app">
@@ -29,16 +31,70 @@
         <div id="inventory-slots"></div>
       </aside>
 
-      <section id="main-menu" class="main-menu">
-        <p class="subtitle">The Silent Witness</p>
-        <h1>FALSE <span>NOTE</span></h1>
-        <nav class="menu-buttons">
-          <button data-action="start">START</button>
-          <button data-action="load">LOAD</button>
-          <button data-action="setting">SETTING</button>
-          <button data-action="exit">KELUAR</button>
-        </nav>
-      </section>
+
+
+      <!-- MAIN MENU LAYER -->
+      <div id="main-menu" class="fixed inset-0 z-[150] h-screen w-screen overflow-hidden bg-slate-950 transition-opacity duration-1000">
+          
+          <!-- BACKGROUND ASSET (Hasil AI) -->
+          <img src="assets/backgrounds/menu_bg.jpeg" class="absolute inset-0 h-full w-full object-cover opacity-60" alt="Background">
+
+          <!-- OVERLAY GRADIENT -->
+          <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent"></div>
+
+          <!-- CONTENT LAYER -->
+          <div class="relative z-10 flex h-full flex-col justify-center px-12 md:px-24">
+              
+              <!-- JUDUL GAME -->
+              <div class="mb-12">
+                  <h1 class="font-serif text-8xl font-bold tracking-tighter text-white">
+                      FALSE <span class="text-red-600 animate-pulse">NOTE</span>
+                  </h1>
+                  <div class="mt-2 h-1 w-32 bg-yellow-500"></div>
+                  <p class="mt-4 font-mono text-sm tracking-[0.3em] text-slate-400 uppercase">
+                      The Silent Witness // 
+                  </p>
+              </div>
+
+              <!-- NAVIGATION MENU -->
+              <nav class="flex flex-col space-y-6">
+                  <!-- Tombol Start -->
+                  <button id="btn-start" class="group flex items-center space-x-4 text-left transition-all">
+                      <div class="h-10 w-1 bg-red-600 opacity-0 transition-all group-hover:opacity-100"></div>
+                      <span class="font-sans text-3xl font-light tracking-widest text-white transition-all group-hover:pl-4 group-hover:text-red-600 uppercase">
+                          Mulai Investigasi
+                      </span>
+                  </button>
+
+                  <!-- Tombol Load -->
+                  <button id="btn-load" class="group flex items-center space-x-4 text-left transition-all">
+                      <div class="h-10 w-1 bg-white opacity-0 transition-all group-hover:opacity-100"></div>
+                      <span id="text-load" class="font-sans text-2xl font-light tracking-widest text-slate-400 transition-all group-hover:pl-4 group-hover:text-white uppercase">
+                          Buka Arsip Kasus
+                      </span>
+                  </button>
+
+                  <!-- Tombol Exit -->
+                  <button id="btn-exit" class="group flex items-center space-x-4 text-left transition-all">
+                      <div class="h-10 w-1 bg-white opacity-0 transition-all group-hover:opacity-100"></div>
+                      <span class="font-sans text-2xl font-light tracking-widest text-slate-400 transition-all group-hover:pl-4 group-hover:text-white uppercase">
+                          Keluar
+                      </span>
+                  </button>
+              </nav>
+
+              <!-- FOOTER INFO -->
+              <div class="absolute bottom-10 left-12 md:left-24">
+                  <p class="font-mono text-[10px] text-slate-500 mb-2 uppercase tracking-wider">
+                      Peringatan: Game ini adalah karya fiksi . Nama, karakter, tempat, dan peristiwa adalah imajinasi penulis.
+                  </p>
+                  <p class="font-mono text-xs text-slate-600">
+                      &copy; 2026 FALSE NOTE. All Rights Reserved. <br>
+                      Authorized Access Only.
+                  </p>
+              </div>
+          </div>
+      </div>
 
       <section id="content-layer" class="content-layer hidden"></section>
 
@@ -55,27 +111,119 @@
         <img src="assets/ui/eitssss.png" alt="EITSSSS!" class="eitssss-logo">
       </div>
 
-      <section id="setting-panel" class="setting-panel hidden">
-        <h2>SETTING</h2>
-        <label class="setting-row">
-          <span>Volume</span>
-          <button id="volume-toggle">ON</button>
-        </label>
-        <label class="setting-row">
-          <span>Text Speed</span>
-          <select id="text-speed">
-            <option value="slow">Slow</option>
-            <option value="normal" selected>Normal</option>
-            <option value="fast">Fast</option>
-          </select>
-        </label>
-        <button id="setting-close">Close</button>
+      <section id="pause-panel" class="pause-overlay hidden">
+        <div class="pause-card">
+          <p class="pause-kicker">PAUSED</p>
+          <h2>FALSE NOTE</h2>
+          <div class="pause-actions">
+            <button id="pause-resume">RESUME</button>
+            <button id="pause-exit">KELUAR</button>
+          </div>
+        </div>
       </section>
+
+      <!-- SETTINGS BUTTON -->
+      <div id="settings-button" class="fixed top-4 right-4 z-[200] cursor-pointer text-gray-400 hover:text-amber-500 transition-colors duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+      </div>
+
+      <!-- SETTINGS PANEL -->
+      <div id="settings-panel" class="fixed hidden top-16 right-4 z-[200] w-72 glass-card p-6 rounded-2xl border-amber-500/30 animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold text-amber-500 uppercase tracking-wider">Pengaturan</h3>
+              <button onclick="toggleSettings()" class="text-stone-500 hover:text-white text-2xl">&times;</button>
+          </div>
+
+          <div class="space-y-6">
+              <div>
+                  <label class="text-xs text-stone-500 uppercase font-bold block mb-2">Volume Musik</label>
+                  <input type="range" id="volume-range" class="w-full accent-amber-500" min="0" max="100" value="70">
+              </div>
+              
+              <button onclick="toggleFullscreen()" class="w-full py-2 bg-stone-800 hover:bg-stone-700 rounded-lg text-sm transition-colors text-white flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                  Toggle Fullscreen
+              </button>
+
+              <button onclick="restartGame()" class="w-full py-2 bg-red-900/40 hover:bg-red-900/60 border border-red-500/50 text-red-200 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Mulai Ulang 
+              </button>
+
+              <button onclick="backToMenu()" class="w-full py-2 border border-amber-500/50 text-amber-500 hover:bg-amber-500/10 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Kembali ke Menu
+              </button>
+          </div>
+      </div>
 
       <div id="toast" class="toast hidden"></div>
     </section>
   </main>
 
+  <script>
+      window.toggleSettings = () => {
+          const panel = document.getElementById('settings-panel');
+          panel.classList.toggle('hidden');
+      };
+
+      window.toggleFullscreen = () => {
+          if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen();
+          } else {
+              if (document.exitFullscreen) {
+                  document.exitFullscreen();
+              }
+          }
+          window.toggleSettings();
+      };
+
+      window.restartGame = () => {
+          if (confirm('Mulai ulang permainan? Semua progres saat ini akan hilang.')) {
+              window.toggleSettings();
+              if (typeof startGame === 'function') {
+                  startGame();
+              } else {
+                  window.location.reload();
+              }
+          }
+      };
+
+      window.backToMenu = () => {
+          if (confirm('Kembali ke Menu Utama? Progres yang belum disimpan akan hilang.')) {
+              window.toggleSettings();
+              if (typeof returnToMainMenu === 'function') {
+                  returnToMainMenu();
+              } else {
+                  window.location.reload();
+              }
+          }
+      };
+
+      // Listener untuk settings button di luar script.js untuk akses cepat
+      document.addEventListener('DOMContentLoaded', () => {
+          const btn = document.getElementById('settings-button');
+          if (btn) btn.onclick = toggleSettings;
+          
+          // Sync volume slider dengan script.js jika perlu
+          const slider = document.getElementById('volume-range');
+          if (slider) {
+              slider.oninput = (e) => {
+                  const vol = e.target.value / 100;
+                  // Logika volume di script.js (jika ada) bisa dipanggil di sini
+              };
+          }
+      });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>

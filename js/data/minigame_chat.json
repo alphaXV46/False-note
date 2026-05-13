@@ -1,0 +1,78 @@
+{
+  "chatLog": [
+    {
+      "sender": "Hendra Kusuma",
+      "message": "Sinta, pastikan angkanya sudah disesuaikan ya.",
+      "timestamp": "2026-09-28 20:14"
+    },
+    {
+      "sender": "Sinta Marlina",
+      "message": "Sudah beres, Pak. Vendor cadangan juga aman.",
+      "timestamp": "2026-09-28 20:18"
+    },
+    {
+      "sender": "Hendra Kusuma",
+      "message": "Bagus. Transfer operasional jangan lewat rekening utama.",
+      "timestamp": "2026-09-28 20:21"
+    },
+    {
+      "sender": "Sinta Marlina",
+      "message": "Saya pakai rekening pribadi seperti arahan.",
+      "timestamp": "2026-09-28 20:25"
+    },
+    {
+      "sender": "Hendra Kusuma",
+      "message": "Jeki, kamu yang tanda tangan laporan ini.",
+      "timestamp": "2026-09-29 08:05"
+    },
+    {
+      "sender": "Jeki Saputra",
+      "message": "Saya belum melihat lampiran lengkapnya, Pak.",
+      "timestamp": "2026-09-29 08:07"
+    },
+    {
+      "sender": "Hendra Kusuma",
+      "message": "Tanda tangan saja. Ini perintah direktur.",
+      "timestamp": "2026-09-29 08:09"
+    }
+  ],
+  "questions": [
+    {
+      "question": "Siapa yang memberi instruksi mengubah angka?",
+      "options": [
+        "Hendra Kusuma",
+        "Jeki Saputra",
+        "Sinta Marlina"
+      ],
+      "correctAnswer": "Hendra Kusuma",
+      "evidenceId": "chat_instruksi_hendra",
+      "feedbackRight": "Instruksi manipulasi datang dari Hendra.",
+      "feedbackWrong": "Perhatikan pesan pertama dari Hendra."
+    },
+    {
+      "question": "Siapa yang dipaksa tanda tangan?",
+      "options": [
+        "Jeki Saputra",
+        "Sinta Marlina",
+        "Hendra Kusuma"
+      ],
+      "correctAnswer": "Jeki Saputra",
+      "evidenceId": "chat_jeki_dipaksa",
+      "feedbackRight": "Jeki ditekan untuk menandatangani laporan.",
+      "feedbackWrong": "Baca pesan Hendra kepada Jeki."
+    },
+    {
+      "question": "Rekening siapa menerima aliran mencurigakan?",
+      "options": [
+        "Sinta Marlina",
+        "Jeki Saputra",
+        "Hendra Kusuma"
+      ],
+      "correctAnswer": "Sinta Marlina",
+      "evidenceId": "rekening_sinta",
+      "feedbackRight": "Sinta memakai rekening pribadinya.",
+      "feedbackWrong": "Cari pesan tentang rekening pribadi."
+    }
+  ],
+  "revealsMoment": "jeki_framed"
+}

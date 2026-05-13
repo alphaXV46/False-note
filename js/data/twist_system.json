@@ -1,0 +1,37 @@
+{
+  "twistTriggers": [
+    {
+      "type": "hasEvidence",
+      "evidenceId": "stempel_jeki_palsu"
+    },
+    {
+      "type": "hasEvidence",
+      "evidenceId": "chat_jeki_dipaksa"
+    }
+  ],
+  "twistDialogue": [
+    {
+      "speaker": "Bella",
+      "text": [
+        "Raka, tunggu.",
+        "Stempel palsu, Jeki dipaksa.",
+        "Dia tidak tahu apa-apa."
+      ]
+    },
+    {
+      "speaker": "Raka",
+      "text": [
+        "Lalu siapa yang menjebaknya?"
+      ]
+    },
+    {
+      "speaker": "Bella",
+      "text": [
+        "Hendra menjebaknya.",
+        "Jeki cuma tameng."
+      ]
+    }
+  ],
+  "twistUnlocked": false,
+  "twistAffectsEnding": true
+}

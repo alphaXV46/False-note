@@ -1,0 +1,29 @@
+[
+  {
+    "id": "doc_anggaran_q3",
+    "title": "Laporan Anggaran Q3",
+    "content": "Laporan menyebut realisasi Q3 sebesar Rp 8,4 miliar. Lampiran audit internal mencatat Rp 6,1 miliar. Tanggal pengesahan tertulis 31 September 2026.",
+    "isManipulated": true,
+    "linkedSuspect": "hendra",
+    "evidenceId": "doc_anggaran_manipulasi",
+    "hint": "Perhatikan tanggal pengesahan laporan."
+  },
+  {
+    "id": "doc_kontrak_vendor",
+    "title": "Kontrak Vendor Pengadaan",
+    "content": "Kontrak mencatat PT Surya Abadi Energi sebagai vendor cadangan. Nomor registrasinya tidak muncul di daftar pengadaan. Persetujuan akhir memakai paraf Sinta.",
+    "isManipulated": true,
+    "linkedSuspect": "sinta",
+    "evidenceId": "kontrak_vendor_fiktif",
+    "hint": "Perhatikan nama vendor di baris kedua."
+  },
+  {
+    "id": "doc_laporan_jeki",
+    "title": "Memo Keuangan Jeki",
+    "content": "Memo Jeki meminta verifikasi ulang sebelum laporan ditandatangani. Nomor dokumen cocok dengan arsip resmi. Catatan waktunya konsisten dengan log kantor.",
+    "isManipulated": false,
+    "linkedSuspect": "jeki",
+    "evidenceId": null,
+    "hint": "Catatan waktunya justru konsisten."
+  }
+]

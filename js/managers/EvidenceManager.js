@@ -54,12 +54,12 @@ class EvidenceManager {
 
   static mainIds() {
     return [
-      'bukti_potongan',
-      'bukti_selisih',
-      'rekam_bicara_bella',
-      'screenshot_chat_admin',
-      'kuitansi_fiktif',
-      'false_note_decrypted'
+      'doc_anggaran_manipulasi',
+      'kontrak_vendor_fiktif',
+      'stempel_jeki_palsu',
+      'chat_instruksi_hendra',
+      'chat_jeki_dipaksa',
+      'rekening_sinta'
     ];
   }
 }

@@ -1,0 +1,94 @@
+[
+  {
+    "id": "hendra",
+    "name": "Hendra Kusuma",
+    "title": "Direktur Utama",
+    "appearance": "ramah dan kooperatif",
+    "actualRole": "koruptor",
+    "crimes": [
+      "Memanipulasi angka anggaran Q3",
+      "Memberi instruksi perubahan laporan",
+      "Menjebak Jeki sebagai pelaku"
+    ],
+    "requiredEvidence": [
+      "doc_anggaran_manipulasi",
+      "chat_instruksi_hendra",
+      "chat_jeki_dipaksa"
+    ],
+    "dialogue": {
+      "first_meet": [
+        "Silakan periksa semuanya, Raka.",
+        "Saya ingin kasus ini jelas."
+      ],
+      "under_pressure": [
+        "Itu hanya penyesuaian administrasi.",
+        "Jangan salah membaca konteks."
+      ],
+      "final": [
+        "Kalian terlalu percaya kertas.",
+        "Perusahaan ini butuh keputusan cepat."
+      ]
+    }
+  },
+  {
+    "id": "jeki",
+    "name": "Jeki Saputra",
+    "title": "Kepala Bagian Keuangan",
+    "appearance": "defensif dan mudah marah",
+    "actualRole": "innocent",
+    "crimes": [
+      "Menandatangani laporan korup",
+      "Memakai stempel direktur tanpa wewenang",
+      "Menyembunyikan perubahan anggaran"
+    ],
+    "requiredEvidence": [
+      "stempel_jeki_palsu",
+      "chat_jeki_dipaksa"
+    ],
+    "dialogue": {
+      "first_meet": [
+        "Saya tidak mau disudutkan.",
+        "Tanya saja atasan saya."
+      ],
+      "under_pressure": [
+        "Saya memang tanda tangan.",
+        "Tapi saya tidak tahu isinya."
+      ],
+      "final": [
+        "Saya kasar, bukan koruptor.",
+        "Nama saya harus dibersihkan."
+      ]
+    }
+  },
+  {
+    "id": "sinta",
+    "name": "Sinta Marlina",
+    "title": "Sekretaris Eksekutif",
+    "appearance": "pendiam dan tidak mencolok",
+    "actualRole": "koruptor",
+    "crimes": [
+      "Membuat kontrak vendor fiktif",
+      "Menerima transfer dana ilegal",
+      "Menyamarkan instruksi Hendra"
+    ],
+    "requiredEvidence": [
+      "kontrak_vendor_fiktif",
+      "rekening_sinta",
+      "chat_instruksi_hendra"
+    ],
+    "dialogue": {
+      "first_meet": [
+        "Saya hanya mengurus jadwal.",
+        "Dokumen itu bukan keputusan saya."
+      ],
+      "under_pressure": [
+        "Rekening itu salah paham.",
+        "Saya hanya mengikuti arahan."
+      ],
+      "final": [
+        "Saya tidak bekerja sendirian.",
+        "Hendra yang mengatur semuanya."
+      ]
+    }
+  }
+]

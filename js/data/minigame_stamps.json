@@ -1,0 +1,38 @@
+[
+  {
+    "id": "stamp_direktur_asli",
+    "owner": "Hendra Kusuma",
+    "isAuthentic": true,
+    "visualHint": "Nomor registrasi DK-019 terlihat lengkap.",
+    "linkedSuspect": "hendra",
+    "evidenceId": null,
+    "revealsTwist": false
+  },
+  {
+    "id": "stamp_keuangan_asli",
+    "owner": "Jeki Saputra",
+    "isAuthentic": true,
+    "visualHint": "Tertulis Kepala Keuangan, bukan Direktur.",
+    "linkedSuspect": "jeki",
+    "evidenceId": null,
+    "revealsTwist": false
+  },
+  {
+    "id": "stamp_jeki_palsu",
+    "owner": "Jeki Saputra",
+    "isAuthentic": false,
+    "visualHint": "Nomor registrasi hilang dan font miring.",
+    "linkedSuspect": "jeki",
+    "evidenceId": "stempel_jeki_palsu",
+    "revealsTwist": true
+  },
+  {
+    "id": "stamp_sekretaris_asli",
+    "owner": "Sinta Marlina",
+    "isAuthentic": true,
+    "visualHint": "Lingkar luar rapi dan cap terbaca.",
+    "linkedSuspect": "sinta",
+    "evidenceId": null,
+    "revealsTwist": false
+  }
+]

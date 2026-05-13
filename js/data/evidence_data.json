@@ -1,47 +1,44 @@
 {
-  "bukti_potongan": {
-    "name": "Email Potongan",
-    "desc": "Email admin meminta potongan 10 persen dari dana beasiswa.",
-    "hint": "Sanggah klaim tidak ada pungli."
+  "doc_anggaran_manipulasi": {
+    "id": "doc_anggaran_manipulasi",
+    "name": "Dokumen Anggaran Q3",
+    "desc": "Dokumen anggaran Q3 menunjukkan angka yang diubah dari lampiran audit.",
+    "linkedSuspect": "hendra",
+    "hint": "Sanggah klaim anggaran sudah sesuai prosedur."
   },
-  "bukti_selisih": {
-    "name": "Selisih Anggaran",
-    "desc": "Laporan tertulis 500 juta, real note hanya 300 juta.",
-    "hint": "Sanggah klaim dana sudah sesuai."
+  "kontrak_vendor_fiktif": {
+    "id": "kontrak_vendor_fiktif",
+    "name": "Kontrak Vendor Fiktif",
+    "desc": "Kontrak memakai vendor yang tidak terdaftar di basis data pengadaan.",
+    "linkedSuspect": "sinta",
+    "hint": "Sanggah klaim semua vendor sudah diverifikasi."
   },
-  "rekam_bicara_bella": {
-    "name": "Rekaman Bella",
-    "desc": "Bella menyebut fee admin secara eksplisit.",
-    "hint": "Sanggah penyangkalan keterlibatan Bella."
+  "stempel_jeki_palsu": {
+    "id": "stempel_jeki_palsu",
+    "name": "Stempel Jeki Palsu",
+    "desc": "Stempel atas nama Jeki ternyata dipalsukan untuk menjebaknya.",
+    "linkedSuspect": "twist_jeki_framed",
+    "hint": "Buktikan Jeki tidak menandatangani dokumen korup secara sadar."
   },
-  "screenshot_chat_admin": {
-    "name": "Screenshot Chat Admin",
-    "desc": "Chat admin mengarahkan mahasiswa untuk transfer ke rekening pribadi.",
-    "hint": "Sanggah klaim prosedur resmi."
+  "chat_instruksi_hendra": {
+    "id": "chat_instruksi_hendra",
+    "name": "Instruksi Hendra",
+    "desc": "Pesan Hendra ke Sinta meminta angka laporan disesuaikan.",
+    "linkedSuspect": "hendra",
+    "hint": "Buktikan instruksi korup datang dari atas."
   },
-  "kuitansi_fiktif": {
-    "name": "Kuitansi Fiktif",
-    "desc": "Kuitansi pengeluaran acara dibuat untuk kegiatan yang tidak pernah terjadi.",
-    "hint": "Sanggah klaim semua kegiatan terlaksana."
+  "chat_jeki_dipaksa": {
+    "id": "chat_jeki_dipaksa",
+    "name": "Jeki Dipaksa Tanda Tangan",
+    "desc": "Pesan Hendra menunjukkan Jeki dipaksa menandatangani laporan.",
+    "linkedSuspect": "twist_jeki_framed",
+    "hint": "Buktikan Jeki korban, bukan pelaku."
   },
-  "false_note_decrypted": {
-    "name": "FALSE_NOTE.sys",
-    "desc": "File terenkripsi berisi seluruh transaksi ilegal.",
-    "hint": "Bukti utama untuk sidang hari ke-7."
-  },
-  "audit_metadata": {
-    "name": "Metadata Audit",
-    "desc": "Log laptop menunjukkan dokumen audit diedit setelah tanggal pengesahan.",
-    "hint": "Pakai untuk membuktikan audit palsu."
-  },
-  "arsip_pencairan": {
-    "name": "Map Arsip Pencairan",
-    "desc": "Map arsip berisi salinan pencairan yang tidak cocok dengan laporan final.",
-    "hint": "Pakai untuk menantang dokumen audit."
-  },
-  "flashdisk_log": {
-    "name": "Flashdisk Log",
-    "desc": "Flashdisk berisi backup transaksi dan jejak revisi dokumen.",
-    "hint": "Bukti kuat saat dokumen terlihat terlalu rapi."
+  "rekening_sinta": {
+    "id": "rekening_sinta",
+    "name": "Rekening Sinta",
+    "desc": "Data transfer mencurigakan mengarah ke rekening pribadi Sinta.",
+    "linkedSuspect": "sinta",
+    "hint": "Sanggah klaim tidak ada aliran dana ilegal."
   }
 }

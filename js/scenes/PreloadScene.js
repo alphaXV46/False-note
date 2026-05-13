@@ -42,6 +42,17 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('dimas_sanggah', 'assets/characters/dimas/Jeki Nyanggah.png');
 
     this.load.json('evidence_data', 'js/data/evidence_data.json');
+    [
+      'suspects',
+      'minigame_documents',
+      'minigame_stamps',
+      'minigame_chat',
+      'twist_system',
+      'ending_data',
+      'phase_data'
+    ].forEach((file) => {
+      this.load.json(file, `js/data/${file}.json`);
+    });
     for (let day = 1; day <= 7; day += 1) {
       this.load.json(`day${day}`, `js/data/day${day}.json`);
     }

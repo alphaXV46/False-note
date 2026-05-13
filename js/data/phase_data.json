@@ -1,0 +1,91 @@
+[
+  {
+    "id": "orientasi",
+    "phase": 1,
+    "title": "Fase 1: Orientasi",
+    "summary": "Raka tiba di lembaga investigasi dan menerima briefing Adrian.",
+    "dialogue": [
+      {
+        "speaker": "Adrian",
+        "text": [
+          "Raka, ini tugas pertamamu.",
+          "Selidiki PT. Nusantara Energi."
+        ]
+      },
+      {
+        "speaker": "Bella",
+        "text": [
+          "Ada tiga nama utama.",
+          "Jangan nilai dari sikap saja."
+        ]
+      }
+    ],
+    "introducesSuspects": [
+      "hendra",
+      "jeki",
+      "sinta"
+    ],
+    "nextPhase": "investigasi"
+  },
+  {
+    "id": "investigasi",
+    "phase": 2,
+    "title": "Fase 2: Investigasi",
+    "summary": "Raka menjalankan tiga mini-game untuk mengumpulkan bukti.",
+    "miniGames": [
+      "minigame_documents",
+      "minigame_stamps",
+      "minigame_chat"
+    ],
+    "dialogue": [
+      {
+        "speaker": "Bella",
+        "text": [
+          "Baca pelan-pelan.",
+          "Detail kecil bisa membalik kasus."
+        ]
+      }
+    ],
+    "nextPhase": "analisis"
+  },
+  {
+    "id": "analisis",
+    "phase": 3,
+    "title": "Fase 3: Analisis",
+    "summary": "Raka dan Bella mencocokkan bukti dengan tuduhan.",
+    "requiresEvidenceReview": true,
+    "dialogue": [
+      {
+        "speaker": "Raka",
+        "text": [
+          "Jeki terlihat paling mencurigakan."
+        ]
+      },
+      {
+        "speaker": "Bella",
+        "text": [
+          "Sikap bukan bukti.",
+          "Cocokkan semuanya lagi."
+        ]
+      }
+    ],
+    "nextPhase": "sidang"
+  },
+  {
+    "id": "sidang",
+    "phase": 4,
+    "title": "Fase 4: Sidang",
+    "summary": "Raka memilih siapa yang dilaporkan dan menentukan ending.",
+    "usesEndingData": "ending_data",
+    "dialogue": [
+      {
+        "speaker": "Adrian",
+        "text": [
+          "Laporkan hanya yang terbukti.",
+          "Sidang ini menentukan semuanya."
+        ]
+      }
+    ],
+    "nextPhase": null
+  }
+]
