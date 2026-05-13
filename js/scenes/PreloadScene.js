@@ -62,9 +62,7 @@ class PreloadScene extends Phaser.Scene {
     this.createGeneratedAssets();
     this.cleanCharacterEdges();
     EvidenceManager.init(this);
-    for (let day = 1; day <= 7; day += 1) {
-      EvidenceManager.validateDay(this.cache.json.get(`day${day}`));
-    }
+    EvidenceManager.validateLoreData(this);
     window.falseNoteReady = true;
     if (window.falseNoteStartPending) window.falseNoteStartPending();
   }

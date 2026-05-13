@@ -48,6 +48,34 @@ class EvidenceManager {
     }
   }
 
+  static validateLoreData(scene) {
+    const warnMissing = (id, source) => {
+      if (id && !this.get(id)) {
+        console.warn(`[WARNING] Evidence ID tidak ditemukan di ${source}: ${id}`);
+      }
+    };
+
+    scene.cache.json.get('suspects')?.forEach((suspect) => {
+      suspect.requiredEvidence?.forEach((id) => warnMissing(id, `suspects/${suspect.id}`));
+    });
+
+    scene.cache.json.get('minigame_documents')?.forEach((documentData) => {
+      warnMissing(documentData.evidenceId, `minigame_documents/${documentData.id}`);
+    });
+
+    scene.cache.json.get('minigame_stamps')?.forEach((stamp) => {
+      warnMissing(stamp.evidenceId, `minigame_stamps/${stamp.id}`);
+    });
+
+    scene.cache.json.get('minigame_chat')?.questions?.forEach((question) => {
+      warnMissing(question.evidenceId, 'minigame_chat');
+    });
+
+    scene.cache.json.get('twist_system')?.twistTriggers?.forEach((trigger) => {
+      warnMissing(trigger.evidenceId, 'twist_system');
+    });
+  }
+
   static allIds() {
     return this.mainIds();
   }
