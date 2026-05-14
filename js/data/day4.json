@@ -1,0 +1,59 @@
+{
+  "day": 4,
+  "titleCard": "HARI KE-4: Kepercayaan Bisa Dibeli",
+  "headlineMorning": "Sumber Internal Bocorkan Dokumen Rahasia",
+  "headlineEvening": "#PercayaRaka Trending di Kampus",
+  "headlineEveningResult": "Buzzer Kampus Mulai Menyerang Saksi",
+  "morning": {
+    "background": "bg_legal_kopi",
+    "dialog": [
+      {"speaker": "Bella", "text": ["Ada kuitansi acara.", "Tapi acaranya tidak pernah ada."]},
+      {"speaker": "Raka", "text": ["Kalau benar, ini kuat.", "Aku butuh salinan."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih dokumen rahasia yang relevan.",
+      "options": [
+        {"text": "Notulen rapat UKM seni", "isCorrect": false, "feedbackWrong": "Tidak berhubungan dengan beasiswa."},
+        {"text": "Kuitansi seminar fiktif", "isCorrect": true, "evidenceGain": "kuitansi_fiktif", "feedbackRight": "Kuitansi ini dibuat untuk acara palsu."}
+      ]
+    },
+    "suspicionGain": 11,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Kuitansi dibandingkan kalender.", "Tidak ada agenda yang cocok."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih anomali jadwal pada kuitansi.",
+      "options": [
+        {"text": "Seminar tercatat saat kampus libur", "isCorrect": true, "feedbackRight": "Acara tidak mungkin berjalan hari itu."},
+        {"text": "Nomor surat memakai angka genap", "isCorrect": false, "feedbackWrong": "Nomor surat tidak membuktikan apa-apa."}
+      ]
+    },
+    "suspicionGain": 8,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Profesor X sudah setuju.", "Kamu mau melawan ahli?"]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Appeal to Authority",
+      "fallacyExplanation": "Appeal to Authority memakai nama tokoh untuk mengganti bukti.",
+      "fallacyCounterTip": "Hormati ahli, tetapi tetap minta data dan dokumen.",
+      "statements": [
+        {"text": "Profesor X sudah menyetujui laporan ini.", "fallacy": "Appeal to Authority"}
+      ],
+      "correctEvidence": "kuitansi_fiktif",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Nama besar bukan pengganti bukti. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}
