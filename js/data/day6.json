@@ -1,0 +1,60 @@
+{
+  "day": 6,
+  "titleCard": "HARI KE-6: Satu Lawan Semua",
+  "headlineMorning": "Debat Sengit di Media Sosial Kampus",
+  "headlineEvening": "Tekanan pada Raka Semakin Besar",
+  "headlineEveningResult": "Dosen Wali Minta Raka Berhenti",
+  "morning": {
+    "background": "bg_balairung",
+    "dialog": [
+      {"speaker": "Dimas", "text": ["Mereka menekan beasiswamu.", "Kamu perlu bicara hati-hati."]},
+      {"speaker": "Raka", "text": ["Aku tidak cari musuh.", "Aku cari kebenaran."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih pesan yang harus diklarifikasi.",
+      "options": [
+        {"text": "Raka memalsukan semua bukti", "isCorrect": true, "feedbackRight": "Klarifikasi cepat menjaga reputasi."},
+        {"text": "Raka jarang hadir olahraga", "isCorrect": false, "feedbackWrong": "Isu itu hanya pengalih perhatian."}
+      ]
+    },
+    "suspicionGain": 12,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_legal_kopi",
+    "dialog": [
+      {"speaker": "Bella", "text": ["Aku takut disebut pengkhianat.", "Tapi aku akan bersaksi."]},
+      {"speaker": "Raka", "text": ["Kamu tidak sendiri.", "Data akan bicara."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih bukti untuk melindungi Bella.",
+      "options": [
+        {"text": "Rekaman asli dengan metadata waktu", "isCorrect": true, "feedbackRight": "Metadata membantu mencegah fitnah."},
+        {"text": "Komentar anonim di forum", "isCorrect": false, "feedbackWrong": "Komentar anonim mudah diputar balik."}
+      ]
+    },
+    "suspicionGain": 10,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Diam atau dipecat.", "Pilih sekarang, Raka."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "False Dilemma",
+      "fallacyExplanation": "False Dilemma memaksa dua pilihan seolah tidak ada opsi lain.",
+      "fallacyCounterTip": "Cari opsi ketiga yang sah, seperti jalur pelaporan resmi.",
+      "statements": [
+        {"text": "Diam atau dipecat. Pilih.", "fallacy": "False Dilemma"}
+      ],
+      "correctEvidence": "screenshot_chat_admin",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu menerima pilihan palsu. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}

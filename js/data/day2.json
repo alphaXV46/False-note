@@ -1,0 +1,60 @@
+{
+  "day": 2,
+  "titleCard": "HARI KE-2: Angka Tidak Pernah Bohong",
+  "headlineMorning": "Laporan Keuangan Fakultas Dipertanyakan",
+  "headlineEvening": "Selisih Dana Beasiswa: Salah Cetak atau Sengaja?",
+  "headlineEveningResult": "Tagar AuditBeasiswa Mulai Ramai",
+  "morning": {
+    "background": "bg_magang_fh",
+    "dialog": [
+      {"speaker": "Bella", "text": ["Raka, jangan terlalu serius.", "Data sering telat diperbarui."]},
+      {"speaker": "Raka", "text": ["Kalau telat, harus ada jejak.", "Aku cek email masuk."]}
+    ],
+    "miniGame": {
+      "type": "email_sorting",
+      "question": "Pilih email yang paling perlu diaudit.",
+      "options": [
+        {"text": "Undangan lomba debat fakultas", "isCorrect": false, "feedbackWrong": "Itu kegiatan biasa."},
+        {"text": "Perubahan rekening pencairan beasiswa", "isCorrect": true, "evidenceGain": "screenshot_chat_admin", "feedbackRight": "Rekening pribadi muncul di prosedur resmi."}
+      ]
+    },
+    "suspicionGain": 7,
+    "integrityCostIfWrong": 10
+  },
+  "afternoon": {
+    "background": "bg_perpus_ui",
+    "dialog": [
+      {"speaker": "Sistem", "text": ["Dua tabel dibuka bersamaan.", "Satu angka tidak mau diam."]},
+      {"speaker": "Raka", "text": ["Data lama dan baru berbeda.", "Ini pola, bukan typo."]}
+    ],
+    "miniGame": {
+      "type": "false_note_compare",
+      "question": "Pilih data yang berubah tanpa berita acara.",
+      "options": [
+        {"text": "Tanggal rapat 12 Mei", "isCorrect": false, "feedbackWrong": "Tanggal ini konsisten."},
+        {"text": "Rekening tujuan diganti malam hari", "isCorrect": true, "feedbackRight": "Perubahan malam hari harus dicatat."}
+      ]
+    },
+    "suspicionGain": 8,
+    "integrityCostIfWrong": 10
+  },
+  "evening": {
+    "background": "bg_sosmed_kampus",
+    "dialog": [
+      {"speaker": "Dr. Adrian", "text": ["Jadi kamu menuduh seluruh fakultas?", "Itu fitnah besar, Raka."]}
+    ],
+    "debate": {
+      "opponent": "Dr. Adrian",
+      "fallacyType": "Strawman",
+      "fallacyExplanation": "Strawman memelintir argumen lawan agar mudah diserang.",
+      "fallacyCounterTip": "Kembalikan isu ke klaim asli dan data spesifik.",
+      "statements": [
+        {"text": "Jadi kamu bilang seluruh fakultas korupsi?", "fallacy": "Strawman"}
+      ],
+      "correctEvidence": "bukti_selisih",
+      "publicTrustChange": 10,
+      "wrongFeedback": "Kamu ikut menyerang versi palsu argumenmu. Integritas -10."
+    }
+  },
+  "checkpoint": true
+}
